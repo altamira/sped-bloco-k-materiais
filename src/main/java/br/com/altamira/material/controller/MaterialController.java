@@ -80,7 +80,7 @@ public class MaterialController {
 					replaceVariables(variaveis, item.getItem().getDescricao()),
 					item.getItem().getVariavel().get(item.getMedida().getCodigo()), item.getMedida().getUnidade()));
 			for (Map.Entry<String, BigDecimal> v : item.getItem().getVariavel().entrySet()) {
-				System.out.println(String.format("%s %s [%.4f]", tab + "   ", v.getKey(), v.getValue()));
+				System.out.println(String.format("%s [%s=%.4f]", tab + " =>", v.getKey(), v.getValue()));
 			}
 			printMaterial(item.getItem().getVariavel(), item.getItem(), tab + "--");
 		}

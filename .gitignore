@@ -1,1 +1,7 @@
 target
+.mvn
+.settings
+.project
+.classpath
+.springBeans
+mvnw
