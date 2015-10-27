@@ -1,8 +1,8 @@
 package br.com.altamira.material.controller;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,10 +14,13 @@ import br.com.altamira.data.wbccad.model.Prdorc;
 import br.com.altamira.material.expression.Expression;
 import br.com.altamira.material.model.Material;
 import br.com.altamira.material.model.MaterialItem;
-import br.com.altamira.material.model.Medida;
 import br.com.altamira.material.repository.MateriaItemRepository;
 import br.com.altamira.material.repository.MaterialRepository;
 import br.com.altamira.material.repository.MedidaRepository;
+
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Controller
 public class MaterialController {
@@ -32,7 +35,7 @@ public class MaterialController {
 	private MedidaRepository medidaRepository;
 
 	@Transactional
-	@JmsListener(destination = "import-material")
+	@JmsListener(destination = "IMPORT-MATERIAL")
 	public void importMaterial(Prdorc prdorc) {
 		System.out.println("Recebido " + prdorc.getProduto());
 
@@ -47,19 +50,24 @@ public class MaterialController {
 		System.out.println("Gravado ID " + stored.getCodigo());
 	}
 
-	@JmsListener(destination = "material-list")
-	public void calculeMaterial(String codigo) {
-		Material material = materialRepository.findOne(codigo);
+	@JmsListener(destination = "MATERIAL-LIST")
+	public void calculeMaterial(String parameters) throws JsonParseException, JsonMappingException, IOException {
+		ObjectMapper o = new ObjectMapper();
+		
+		@SuppressWarnings("unchecked")
+		Map<String, Object> param = o.readValue(parameters, Map.class);
+		
+		Material material = materialRepository.findOne(param.get("codigo").toString());
 
 		if (material == null) {
-			System.out.println("Codigo nao entrado" + codigo);
+			System.out.println("Codigo nao entrado" + param.get("codigo"));
 			return;
 		}
 
 		Map<String, BigDecimal> variaveis = new HashMap<String, BigDecimal>();
 
-		variaveis.put("c", new BigDecimal(505));
-		variaveis.put("q", new BigDecimal(80));
+		variaveis.put("c", new BigDecimal(param.get("c").toString()));
+		variaveis.put("q", new BigDecimal(param.get("q").toString()));
 
 		System.out.println(String.format("%s %s", material.getCodigo(),
 				replaceVariables(variaveis, material.getDescricao())));
@@ -72,13 +80,13 @@ public class MaterialController {
 
 		for (MaterialItem item : material.getItem()) {
 			item.getItem().getVariavel().putAll(variaveis);
-			Expression exp = new Expression(item.getExpressao());
+			Expression exp = new Expression(item.getConsumoExpressao());
 			exp.setVariables(item.getItem().getVariavel());
-			item.getItem().getVariavel().put(item.getMedida().getCodigo(), exp.eval());
+			item.getItem().getVariavel().put(item.getConsumoMedida().getCodigo(), exp.eval());
 			System.out.println(String.format("%s %s %s [%.3f %s]", tab, item
 					.getItem().getCodigo(),
 					replaceVariables(variaveis, item.getItem().getDescricao()),
-					item.getItem().getVariavel().get(item.getMedida().getCodigo()), item.getMedida().getUnidade()));
+					item.getItem().getVariavel().get(item.getConsumoMedida().getCodigo()), item.getConsumoMedida().getUnidade()));
 			for (Map.Entry<String, BigDecimal> v : item.getItem().getVariavel().entrySet()) {
 				System.out.println(String.format("%s [%s=%.4f]", tab + " =>", v.getKey(), v.getValue()));
 			}

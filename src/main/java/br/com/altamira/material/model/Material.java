@@ -28,6 +28,11 @@ public class Material {
 	@Column(name = "TIPO", nullable = false)
 	private String tipo;
 
+	/*
+	@OneToMany(mappedBy = "codigo", fetch = FetchType.EAGER)
+	private List<MaterialMedida> medida;
+	*/
+
 	@OneToMany(mappedBy = "material", fetch = FetchType.EAGER)
 	private List<MaterialItem> item;
 	

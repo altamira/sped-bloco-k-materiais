@@ -11,7 +11,7 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 @Entity
-@Table(name = "MATERIAL_PRODUCAO")
+@Table(name = "MATERIAL_EST")
 public class MaterialItem {
 
 	@Id
@@ -31,17 +31,30 @@ public class MaterialItem {
 	private Material item;
 	
 	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "MEDIDA", nullable = false)
-	private Medida medida;
+	@JoinColumn(name = "CONSUMO_MED", nullable = false)
+	private Medida consumoMedida;
 	
-	@Column(name = "UNIDADE")
-	private String unidade;
+	@Column(name = "CONSUMO_UN")
+	private String consumoUnidade;
 	
-	@Column(name = "VALOR")
-	private String expressao;
+	@Column(name = "CONSUMO_VLR")
+	private String consumoExpressao;
+
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "PERDA_MED", nullable = false)
+	private Medida perdaMedida;
+	
+	@Column(name = "PERDA_UN")
+	private String perdaUnidade;
+	
+	@Column(name = "PERDA_VLR")
+	private String perdaExpressao;
 	
 	@Transient
-	private Double valor;
+	private Double consumoValor;
+
+	@Transient
+	private Double perdaValor;
 
 	public Long getId() {
 		return id;
@@ -75,36 +88,68 @@ public class MaterialItem {
 		this.item = item;
 	}
 
-	public Medida getMedida() {
-		return medida;
+	public Medida getConsumoMedida() {
+		return consumoMedida;
 	}
 
-	public void setMedida(Medida medida) {
-		this.medida = medida;
+	public void setConsumoMedida(Medida consumoMedida) {
+		this.consumoMedida = consumoMedida;
 	}
 
-	public String getUnidade() {
-		return unidade;
+	public String getConsumoUnidade() {
+		return consumoUnidade;
 	}
 
-	public void setUnidade(String unidade) {
-		this.unidade = unidade;
+	public void setConsumoUnidade(String consumoUnidade) {
+		this.consumoUnidade = consumoUnidade;
 	}
 
-	public String getExpressao() {
-		return expressao;
+	public String getConsumoExpressao() {
+		return consumoExpressao;
 	}
 
-	public void setExpressao(String expressao) {
-		this.expressao = expressao;
+	public void setConsumoExpressao(String consumoExpressao) {
+		this.consumoExpressao = consumoExpressao;
 	}
 
-	public Double getValor() {
-		return valor;
+	public Medida getPerdaMedida() {
+		return perdaMedida;
 	}
 
-	public void setValor(Double valor) {
-		this.valor = valor;
+	public void setPerdaMedida(Medida perdaMedida) {
+		this.perdaMedida = perdaMedida;
 	}
-	
+
+	public String getPerdaUnidade() {
+		return perdaUnidade;
+	}
+
+	public void setPerdaUnidade(String perdaUnidade) {
+		this.perdaUnidade = perdaUnidade;
+	}
+
+	public String getPerdaExpressao() {
+		return perdaExpressao;
+	}
+
+	public void setPerdaExpressao(String perdaExpressao) {
+		this.perdaExpressao = perdaExpressao;
+	}
+
+	public Double getConsumoValor() {
+		return consumoValor;
+	}
+
+	public void setConsumoValor(Double consumoValor) {
+		this.consumoValor = consumoValor;
+	}
+
+	public Double getPerdaValor() {
+		return perdaValor;
+	}
+
+	public void setPerdaValor(Double perdaValor) {
+		this.perdaValor = perdaValor;
+	}
+
 }
