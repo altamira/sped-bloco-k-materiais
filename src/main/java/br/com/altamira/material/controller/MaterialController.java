@@ -36,7 +36,7 @@ public class MaterialController {
 
 	@Transactional
 	@JmsListener(destination = "IMPORT-MATERIAL")
-	public void importMaterial(Prdorc prdorc) {
+	public void importaaMaterial(Prdorc prdorc) {
 		System.out.println("Recebido " + prdorc.getProduto());
 
 		Material material = new Material();
@@ -51,7 +51,7 @@ public class MaterialController {
 	}
 
 	@JmsListener(destination = "MATERIAL-LIST")
-	public void calculeMaterial(String parameters) throws JsonParseException, JsonMappingException, IOException {
+	public void calculaEstruturaMaterial(String parameters) throws JsonParseException, JsonMappingException, IOException {
 		ObjectMapper o = new ObjectMapper();
 		
 		@SuppressWarnings("unchecked")
@@ -71,11 +71,11 @@ public class MaterialController {
 
 		System.out.println(String.format("%s %s", material.getCodigo(),
 				replaceVariables(variaveis, material.getDescricao())));
-		printMaterial(variaveis, material, " +");
+		imprimeEstruturaMaterial(variaveis, material, " +");
 
 	}
 
-	private void printMaterial(Map<String, BigDecimal> variaveis,
+	private void imprimeEstruturaMaterial(Map<String, BigDecimal> variaveis,
 			Material material, String tab) {
 
 		for (MaterialItem item : material.getItem()) {
@@ -90,7 +90,7 @@ public class MaterialController {
 			for (Map.Entry<String, BigDecimal> v : item.getItem().getVariavel().entrySet()) {
 				System.out.println(String.format("%s [%s=%.4f]", tab + " =>", v.getKey(), v.getValue()));
 			}
-			printMaterial(item.getItem().getVariavel(), item.getItem(), tab + "--");
+			imprimeEstruturaMaterial(item.getItem().getVariavel(), item.getItem(), tab + "--");
 		}
 		
 	}
@@ -101,6 +101,28 @@ public class MaterialController {
 			texto = texto.replaceAll("\\#" + e.getKey() + "\\#", e.getValue().toString());
 		}
 		return texto;
+	}
+	
+	
+	@JmsListener(destination = "IHM-MATERIAL-CADASTRO")
+	public void materialCadastro(String msg) throws JsonParseException, JsonMappingException, IOException {
+		System.out.println(String.format("CHEGOU MENSAGEM DE IHM-MATERIAL-CADASTRO: %s", msg));
+		ObjectMapper mapper = new ObjectMapper();
+		Map<String, Object> message = mapper.readValue(msg, Map.class);
+	}
+	
+	@JmsListener(destination = "IHM-MATERIAL-MOVIMENTO")
+	public void materialMovimento(String msg) throws JsonParseException, JsonMappingException, IOException {
+		System.out.println(String.format("CHEGOU MENSAGEM DE IHM-MATERIAL-MOVIMENTO: %s", msg));
+		ObjectMapper mapper = new ObjectMapper();
+		Map<String, Object> message = mapper.readValue(msg, Map.class);
+	}
+	
+	@JmsListener(destination = "IHM-MATERIAL-TRANSFORMACAO")
+	public void materialTransformacao(String msg) throws JsonParseException, JsonMappingException, IOException {
+		System.out.println(String.format("CHEGOU MENSAGEM DE IHM-MATERIAL-TRANSFORMACAO: %s", msg));
+		ObjectMapper mapper = new ObjectMapper();
+		Map<String, Object> message = mapper.readValue(msg, Map.class);
 	}
 
 }

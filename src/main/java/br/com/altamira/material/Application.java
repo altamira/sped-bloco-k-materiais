@@ -7,11 +7,12 @@ import javax.sql.DataSource;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceBuilder;
 import org.springframework.boot.autoconfigure.orm.jpa.EntityManagerFactoryBuilder;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.orm.jpa.EntityScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Primary;
@@ -21,26 +22,29 @@ import org.springframework.jms.connection.CachingConnectionFactory;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.web.socket.config.annotation.EnableWebSocket;
 
 @SpringBootApplication
 @EnableJms
-@EnableJpaRepositories
+@EnableWebSocket
 @EnableTransactionManagement
 @ComponentScan("br.com.altamira.material")
-@EnableConfigurationProperties
+//@EnableConfigurationProperties
+@EntityScan(basePackages = "br.com.altamira.material.model")
+@EnableJpaRepositories(transactionManagerRef = "TransactionManager", entityManagerFactoryRef = "EntityManagerFactory", basePackages = "br.com.altamira.material.repository")
 public class Application {
 
 	@Bean
 	ConnectionFactory connectionFactory() {
 		return new CachingConnectionFactory(new ActiveMQConnectionFactory(
-				"tcp://127.0.0.1:61616"));
+				"tcp://192.168.0.211:61616"));
 	}
 	
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
     }
     
-	@Primary
+	/*@Primary
 	@Bean(name = "DataSource")
 	@ConfigurationProperties(prefix = "datasource")
 	public DataSource DataSource() {
@@ -61,5 +65,5 @@ public class Application {
 		JpaTransactionManager transactionManager = new JpaTransactionManager();
 		transactionManager.setEntityManagerFactory(emf);
 		return transactionManager;
-	}
+	}*/
 }
