@@ -51,7 +51,7 @@ public class MonitoramentoController {
 		
 		int modo = Integer.parseInt(mensagem.get("modo").toString());
 		
-		String usuario = mensagem.get("usuario") == null ? "" : mensagem.get("usuario").toString();
+		String operador = mensagem.get("usuario") == null ? "" : mensagem.get("usuario").toString();
 		
 		Integer[] torque = mapper.convertValue(status.get("torque"), Integer[].class);
 		
@@ -64,7 +64,7 @@ public class MonitoramentoController {
 		MaquinaLog log = new MaquinaLog(
 				maquina,
 				modo,
-				usuario,
+				operador,
 				torque[0],
 				torque[0],
 				corrente[0],

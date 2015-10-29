@@ -69,8 +69,12 @@
     springCloudAws.filter('modoOperacao', function () {
         return function (input) {
             switch (input) {
-            case 1: return 'Manual';
-            case 2: return 'Automatico';
+            case 0: return 'Parada Indeterminado';
+            case 1: return 'Ociosa';
+            case 2: return 'Produzindo';
+            case 3: return 'Manual';
+            case 4: return 'Preparacao';
+            case 5: return 'Manutencao';
             }
         }
     });

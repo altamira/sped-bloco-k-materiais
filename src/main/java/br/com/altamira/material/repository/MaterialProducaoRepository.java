@@ -4,11 +4,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import br.com.altamira.material.model.Medida;
+import br.com.altamira.material.model.MaterialProducao;
 
 @Repository
 @Transactional
-public interface MedidaRepository extends JpaRepository<Medida, String> {
+public interface MaterialProducaoRepository extends JpaRepository<MaterialProducao, Long> {
 
-	Medida findByDescricao(String descricao);
 }

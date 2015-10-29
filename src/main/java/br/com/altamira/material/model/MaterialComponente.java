@@ -11,8 +11,8 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 @Entity
-@Table(name = "MATERIAL_EST")
-public class MaterialItem {
+@Table(name = "MATERIAL_COMPONENTE")
+public class MaterialComponente {
 
 	@Id
 	@GeneratedValue
@@ -27,8 +27,8 @@ public class MaterialItem {
 	private Material material;
 	
 	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "ITEM", nullable = false)
-	private Material item;
+	@JoinColumn(name = "COMPONENTE", nullable = false)
+	private Material componente;
 	
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "CONSUMO_MED", nullable = false)
@@ -80,12 +80,12 @@ public class MaterialItem {
 		this.material = material;
 	}
 
-	public Material getItem() {
-		return item;
+	public Material getComponente() {
+		return componente;
 	}
 
-	public void setItem(Material item) {
-		this.item = item;
+	public void setComponente(Material componente) {
+		this.componente = componente;
 	}
 
 	public Medida getConsumoMedida() {

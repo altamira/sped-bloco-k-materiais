@@ -28,13 +28,16 @@ public class Material {
 	@Column(name = "TIPO", nullable = false)
 	private String tipo;
 
+	@Column(name = "ESTOQUE")
+	private BigDecimal estoque;
+	
 	/*
 	@OneToMany(mappedBy = "codigo", fetch = FetchType.EAGER)
 	private List<MaterialMedida> medida;
 	*/
 
 	@OneToMany(mappedBy = "material", fetch = FetchType.EAGER)
-	private List<MaterialItem> item;
+	private List<MaterialComponente> componente;
 	
 	@Transient
 	private Map<String, BigDecimal> variavel = new HashMap<String, BigDecimal>();
@@ -63,12 +66,12 @@ public class Material {
 		this.tipo = tipo;
 	}
 
-	public List<MaterialItem> getItem() {
-		return item;
+	public List<MaterialComponente> getComponente() {
+		return componente;
 	}
 
-	public void setItem(List<MaterialItem> item) {
-		this.item = item;
+	public void setComponente(List<MaterialComponente> componente) {
+		this.componente = componente;
 	}
 
 	public Map<String, BigDecimal> getVariavel() {
@@ -77,6 +80,14 @@ public class Material {
 
 	public void setVariavel(Map<String, BigDecimal> variavel) {
 		this.variavel = variavel;
+	}
+
+	public BigDecimal getEstoque() {
+		return estoque;
+	}
+
+	public void setEstoque(BigDecimal estoque) {
+		this.estoque = estoque;
 	}
 	
 }

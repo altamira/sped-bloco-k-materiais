@@ -1,0 +1,69 @@
+0. MENSAGEM DE STATUS
+
+{
+"maquina": "IHMPPALETE",
+"datahora": "2015-10-29T12:25:43-0400",
+"modo": 2,
+"operador": "IRANILDO",
+"parametros": 
+      [
+        { "medida": "torque_medio", "unidade": "%", "valor": 300},
+        { "medida": "torque_maximo", "unidade": "%", "valor": 300},
+        { "medida": "corrente_media", "unidade": "A", "valor": 1.650000},
+        { "medida": "corrente_maxima", "unidade": "A", "valor": 1.650000},
+        { "medida": "temperatura_media", "unidade": "C", "valor": 0},
+        { "medida": "temperatura_maxima", "unidade": "C", "valor": 0},
+        { "medida": "tempo_ligado", "unidade": "s", "valor": 2154}
+      ]
+}
+
+1. MOVIMENTACAO FISICA DE ESTOQUE (NAO ALTERA QUANTIDADES/MEDIDAS)(ALTERA LOCAL/RESPONSAVEL)
+
+{
+"maquina": "IHMPPALETE",
+"datahora": "2015-10-29T12:25:43-0400",
+"operador": "IRANILDO",
+"material": 
+  { 
+    "rastreamento": 
+      { 
+        "tipo": "01", 
+	"numero": "314700"
+      }, 
+    "codigo": "ALPCFF01008150000000", 
+    "descricao": "AÇO CHAPA FINA FRIO SAE1008/1010 C/ 1,50MM ESP", 
+    "emUso": false,
+    "local":"AE1",
+    "medida": 
+      [
+        { "medida": "largura", "unidade": "mm", "valor": 300},
+        { "medida": "espessura", "unidade": "mm", "valor": 1.650000},
+        { "medida": "quantidade", "unidade": "pc", "valor": 0},
+        { "medida": "comprimento", "unidade": "mm", "valor": 0},
+        { "medida": "peso", "unidade": "kg", "valor": 2100.000000}
+      ]
+  }
+}
+
+2. MOVIMENTACAO/TRANSFERENCIA DE ESTOQUES (ALTERA QUANTIDADES/MEDIDAS/TIPO ESTOQUE)(NAO ALTERA LOCAL/RESPONSAVEL)
+
+{
+"maquina": "IHMPPALETE",
+"datahora": "2015-10-28T12:25:43.511Z",
+"operador": "IRANILDO",
+"producao": 
+  { 
+    "codigo": "PPLSIG14080170000000", "descricao": "LONGARINA SG120 CH14 F240 MED.2300MM", "rastreamento": { "tipo": "03", "numero": "4459"}, "medida": [{ "medida": "quantidade", "unidade": "pc", "valor": 210}, { "medida": "peso", "unidade": "pc", "valor": 1}]
+  },
+"consumo": 
+  [ 
+    { "codigo": "PPLGAR0LEVE080000000", "descricao": "GARRA NOVA PORTA-PALETE (D)", "rastreamento": { "tipo": "03", "numero": "7548"}, "medida": [{ "medida": "percentual", "unidade": "%", "valor": 1}]},
+    { "codigo": "PPLGAR0LEVE080000000", "descricao": "GARRA NOVA PORTA-PALETE (E)", "rastreamento": { "tipo": "03", "numero": "69582"}, "medida": [{ "medida": "quantidade", "unidade": "C", "valor": 1}]},
+    { "codigo": "PPLGAR0LEVE080000000",  "descricao": "PERFIL LONG SG120 CH14 F240 MED.#d#MM", "rastreamento": { "tipo": "03", "numero": "1231312"}, "medida": [{ "medida": "peso", "unidade": "kg", "valor": 1}]}
+  ],
+"perda": 
+  { 
+    "codigo": "ALPCFF01008150000000", "descricao": "AÇO CHAPA FINA FRIO SAE1008/1010 C/ 1,50MM ESP", "rastreamento": { "tipo": "03", "numero": "314700"}, "medida": [{ "medida": "peso", "unidade": "kg", "valor": 27.14}]
+  }
+}
+

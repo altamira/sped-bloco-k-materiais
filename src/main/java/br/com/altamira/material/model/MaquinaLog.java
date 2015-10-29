@@ -30,8 +30,8 @@ public class MaquinaLog {
 	@Column(name = "MODO")
 	private int modo;
 	
-	@Column(name = "USUARIO")
-	private String usuario;
+	@Column(name = "OPERADOR")
+	private String operador;
 	
 	@Column(name = "TORQUE_MIN")
 	private int torqueMin;
@@ -54,13 +54,13 @@ public class MaquinaLog {
 	@Column(name = "UPTIME")
 	private int uptime;
 
-	public MaquinaLog(String maquina, int modo, String usuario, int torqueMin,
+	public MaquinaLog(String maquina, int modo, String operador, int torqueMin,
 			int torqueMax, int correnteMin, int correnteMax,
 			int temperaturaMin, int temperaturaMax, int uptime) {
 		super();
 		this.maquina = maquina;
 		this.modo = modo;
-		this.usuario = usuario;
+		this.operador = operador;
 		this.torqueMin = torqueMin;
 		this.torqueMax = torqueMax;
 		this.correnteMin = correnteMin;
@@ -102,12 +102,12 @@ public class MaquinaLog {
 		this.modo = modo;
 	}
 
-	public String getUsuario() {
-		return usuario;
+	public String getOperador() {
+		return operador;
 	}
 
-	public void setUsuario(String usuario) {
-		this.usuario = usuario;
+	public void setOperador(String operador) {
+		this.operador = operador;
 	}
 
 	public int getTorqueMin() {
