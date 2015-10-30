@@ -1,10 +1,14 @@
 package br.com.altamira.material.model;
 
-import java.math.BigDecimal;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinColumns;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
@@ -17,27 +21,25 @@ public class MaterialLote {
 	@Column(name = "MATERIAL")
 	private String material;
 	
-	@Column(name = "QUANT_MED")
-	private String medida;
+	@OneToMany(/*mappedBy = "id",*/ fetch = FetchType.EAGER)
+	@JoinColumns({
+	       @JoinColumn(name = "tipo", referencedColumnName = "TIPO"),
+	       @JoinColumn(name = "numero", referencedColumnName = "NUMERO")
+	    })
+	private Set<MaterialLoteMedida> medidas;
+		
+	@Column(name = "LOCAL")
+	private String local;	
 	
-	@Column(name = "QUANT_UN")
-	private String unidade;
-	
-	@Column(name = "QUANT_VLR")
-	private BigDecimal valor;
-
 	public MaterialLote() {
 		super();
 	}
 
-	public MaterialLote(MaterialLotePK id, String material, String medida,
-			String unidade, BigDecimal valor) {
+	public MaterialLote(MaterialLotePK id, String material, String local) {
 		super();
 		this.id = id;
 		this.material = material;
-		this.medida = medida;
-		this.unidade = unidade;
-		this.valor = valor;
+		this.local = local;
 	}
 
 	public MaterialLotePK getId() {
@@ -56,28 +58,20 @@ public class MaterialLote {
 		this.material = material;
 	}
 
-	public String getMedida() {
-		return medida;
+	public Set<MaterialLoteMedida> getMedidas() {
+		return medidas;
 	}
 
-	public void setMedida(String medida) {
-		this.medida = medida;
+	public void setMedidas(Set<MaterialLoteMedida> medidas) {
+		this.medidas = medidas;
 	}
 
-	public String getUnidade() {
-		return unidade;
+	public String getLocal() {
+		return local;
 	}
 
-	public void setUnidade(String unidade) {
-		this.unidade = unidade;
-	}
-
-	public BigDecimal getValor() {
-		return valor;
-	}
-
-	public void setValor(BigDecimal valor) {
-		this.valor = valor;
+	public void setLocal(String local) {
+		this.local = local;
 	}
 	
 }

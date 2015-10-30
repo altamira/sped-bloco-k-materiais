@@ -16,7 +16,7 @@ import javax.persistence.TemporalType;
 
 @Entity
 @Table(name = "MATERIAL_MOVIMENTO")
-public class MovimentacaoEstoque {
+public class MaterialMovimento {
 
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
@@ -34,16 +34,11 @@ public class MovimentacaoEstoque {
 	private String operador;
 	
 	@OneToMany(mappedBy = "movimento", fetch = FetchType.EAGER)
-	private List<MaterialProducao> producao;
-	
-	@OneToMany(mappedBy = "movimento", fetch = FetchType.EAGER)
-	private List<MaterialConsumo> consumo;
-	
-	@OneToMany(mappedBy = "movimento", fetch = FetchType.EAGER)
-	private List<MaterialPerda> perda;
+	private List<MaterialMovimentoItem> materiais;
 
-	public MovimentacaoEstoque(String maquina, String operador) {
+	public MaterialMovimento(Date datahora, String maquina, String operador) {
 		super();
+		this.datahora = datahora;
 		this.maquina = maquina;
 		this.operador = operador;
 	}
@@ -80,28 +75,12 @@ public class MovimentacaoEstoque {
 		this.operador = operador;
 	}
 
-	public List<MaterialProducao> getProducao() {
-		return producao;
+	public List<MaterialMovimentoItem> getMateriais() {
+		return materiais;
 	}
 
-	public void setProducao(List<MaterialProducao> producao) {
-		this.producao = producao;
-	}
-
-	public List<MaterialConsumo> getConsumo() {
-		return consumo;
-	}
-
-	public void setConsumo(List<MaterialConsumo> consumo) {
-		this.consumo = consumo;
-	}
-
-	public List<MaterialPerda> getPerda() {
-		return perda;
-	}
-
-	public void setPerda(List<MaterialPerda> perda) {
-		this.perda = perda;
+	public void setMateriais(List<MaterialMovimentoItem> materiais) {
+		this.materiais = materiais;
 	}
 	
 }

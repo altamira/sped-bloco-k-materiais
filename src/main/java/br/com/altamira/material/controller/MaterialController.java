@@ -6,6 +6,7 @@ import java.text.ParseException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.annotation.JmsListener;
@@ -16,25 +17,27 @@ import br.com.altamira.data.wbccad.model.Prdorc;
 import br.com.altamira.material.expression.Expression;
 import br.com.altamira.material.model.Material;
 import br.com.altamira.material.model.MaterialComponente;
-import br.com.altamira.material.model.MaterialConsumo;
 import br.com.altamira.material.model.MaterialLote;
+import br.com.altamira.material.model.MaterialLoteMedida;
+import br.com.altamira.material.model.MaterialLoteMedidaPK;
 import br.com.altamira.material.model.MaterialLotePK;
-import br.com.altamira.material.model.MaterialPerda;
-import br.com.altamira.material.model.MaterialProducao;
+import br.com.altamira.material.model.MaterialMovimento;
+import br.com.altamira.material.model.MaterialMovimentoItem;
+import br.com.altamira.material.model.MaterialMovimentoItemMedida;
+import br.com.altamira.material.model.MaterialMovimentoTipo;
 import br.com.altamira.material.model.Medida;
-import br.com.altamira.material.model.MovimentacaoEstoque;
-import br.com.altamira.material.msg.MaterialCadastroMsg;
-import br.com.altamira.material.msg.MaterialMovimentoMsg;
 import br.com.altamira.material.msg.MaterialMsg;
 import br.com.altamira.material.msg.MedidaMsg;
+import br.com.altamira.material.msg.MovimentoMsg;
 import br.com.altamira.material.repository.MaterialComponenteRepository;
-import br.com.altamira.material.repository.MaterialConsumoRepository;
+import br.com.altamira.material.repository.MaterialLoteMedidaRepository;
 import br.com.altamira.material.repository.MaterialLoteRepository;
-import br.com.altamira.material.repository.MaterialPerdaRepository;
-import br.com.altamira.material.repository.MaterialProducaoRepository;
+import br.com.altamira.material.repository.MaterialMovimentoItemMedidaRepository;
+import br.com.altamira.material.repository.MaterialMovimentoItemRepository;
+import br.com.altamira.material.repository.MaterialMovimentoRepository;
+import br.com.altamira.material.repository.MaterialMovimentoTipoRepository;
 import br.com.altamira.material.repository.MaterialRepository;
 import br.com.altamira.material.repository.MedidaRepository;
-import br.com.altamira.material.repository.MovimentacaoEstoqueRepository;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -53,19 +56,22 @@ public class MaterialController {
 	private MedidaRepository medidaRepository;
 
 	@Autowired
-	private MovimentacaoEstoqueRepository movimentacaoEstoqueRepository;
-
-	@Autowired
-	private MaterialProducaoRepository materialProducaoRepository;
-
-	@Autowired
-	private MaterialConsumoRepository materialConsumoRepository;
-
-	@Autowired
-	private MaterialPerdaRepository materialPerdaRepository;
+	private MaterialMovimentoRepository materialMovimentoRepository;
 	
 	@Autowired
 	private MaterialLoteRepository materialLoteRepository;
+	
+	@Autowired
+	private MaterialMovimentoItemRepository materialMovimentoItemRepository;
+	
+	@Autowired
+	private MaterialLoteMedidaRepository materialLoteMedidaRepository;
+	
+	@Autowired
+	private MaterialMovimentoItemMedidaRepository materialMovimentoItemMedidaRepository;
+	
+	@Autowired
+	private MaterialMovimentoTipoRepository materialMovimentoTipoRepository;
 
 	@Transactional
 	@JmsListener(destination = "IMPORT-MATERIAL")
@@ -113,7 +119,7 @@ public class MaterialController {
 	private void imprimeEstruturaMaterial(Map<String, BigDecimal> variaveis,
 			Material material, String tab) {
 
-		for (MaterialComponente componente : material.getComponente()) {
+		for (MaterialComponente componente : material.getComponentes()) {
 			componente.getComponente().getVariavel().putAll(variaveis);
 			Expression exp = new Expression(componente.getConsumoExpressao());
 			exp.setVariables(componente.getComponente().getVariavel());
@@ -148,177 +154,111 @@ public class MaterialController {
 		return texto;
 	}
 
-	@JmsListener(destination = "IHM-MATERIAL-CADASTRO")
-	public void materialCadastro(String msg) throws JsonParseException,
-			JsonMappingException, IOException {
-		System.out.println(String.format(
-				"\n--------------------------------------------------------------------------------\nCHEGOU MENSAGEM DE IHM-MATERIAL-CADASTRO\n--------------------------------------------------------------------------------\n%s\n--------------------------------------------------------------------------------\n", msg));
-		
-		ObjectMapper mapper = new ObjectMapper();
-		MaterialCadastroMsg mensagem = mapper.readValue(msg, MaterialCadastroMsg.class);
-		
-		System.out.println(String.format(
-				"\n********************************************************************************\n -----> CODIGO MATERIAL: [%s] %s\n********************************************************************************\n", mensagem.getDatahora().toString(), mensagem.getMaterial().getCodigo()));
-		
-		Material material = materialRepository.findOne(mensagem.getMaterial().getCodigo());
-		
-		List<MedidaMsg> medida = mensagem.getMaterial().getMedida();
-
-		Medida m = medidaRepository.findByDescricao(medida.get(0).getMedida());
-		
-		MaterialLote lote = materialLoteRepository.findOne(new MaterialLotePK(mensagem.getMaterial().getRastreamento().getTipo(), mensagem.getMaterial().getRastreamento().getNumero()));
-		
-		if (lote == null) {
-			lote = new MaterialLote(new MaterialLotePK(mensagem.getMaterial().getRastreamento().getTipo(), mensagem.getMaterial().getRastreamento().getNumero()), material.getCodigo(), m.getCodigo(), medida.get(0).getUnidade(), medida.get(0).getValor());	
-			materialLoteRepository.saveAndFlush(lote);
-
-			material.setEstoque(material.getEstoque().add(medida.get(0).getValor()));
-			materialRepository.saveAndFlush(material);
-		} else {
-			System.out.println(String.format(
-				"\n********************************************************************************\n -----> CADASTRO DE LOTE JA EXISTE: %s-%s\n********************************************************************************\n", mensagem.getMaterial().getRastreamento().getTipo(), mensagem.getMaterial().getRastreamento().getNumero().toString()));
-		}
-
-	}
-
-	@JmsListener(destination = "IHM-MATERIAL-MOVIMENTO")
+	@Transactional
+	@JmsListener(destination = "IHM-MATERIAL")
 	public void materialMovimento(String msg) throws JsonParseException,
 			JsonMappingException, IOException, ParseException {
 		System.out.println(String.format(
 				"\n--------------------------------------------------------------------------------\nCHEGOU MENSAGEM DE IHM-MATERIAL-MOVIMENTO\n--------------------------------------------------------------------------------\n%s\n--------------------------------------------------------------------------------\n", msg));
 
 		ObjectMapper mapper = new ObjectMapper();
-		MaterialMovimentoMsg mensagem = mapper.readValue(msg, MaterialMovimentoMsg.class);
+		MovimentoMsg movimentoMsg = mapper.readValue(msg, MovimentoMsg.class);
 
-		MovimentacaoEstoque mov = new MovimentacaoEstoque(mensagem.getMaquina(), mensagem.getOperador());
+		MaterialMovimento movimento = new MaterialMovimento(movimentoMsg.getDatahora(), movimentoMsg.getMaquina().toUpperCase(), movimentoMsg.getOperador());
 
-		movimentacaoEstoqueRepository.saveAndFlush(mov);
+		materialMovimentoRepository.saveAndFlush(movimento);
 		
-		if (mensagem.getProducao() != null) {
+		if (movimentoMsg.getMateriais() != null && !movimentoMsg.getMateriais().isEmpty()) {
 			
-			MaterialMsg producao = mensagem.getProducao();
-
-			Material material = materialRepository.findOne(producao.getCodigo());
-
-			if (material != null) {
+			for (MaterialMsg materialMsg : movimentoMsg.getMateriais()) {
 				
-				List<MedidaMsg> medida = producao.getMedida();
-
-				Medida m = medidaRepository.findByDescricao(medida.get(0).getMedida());
-
-				if (m != null) {
-
-					MaterialProducao p = new MaterialProducao(
-							mov.getId(),
-							producao.getCodigo(), 
-							producao.getRastreamento().getTipo() + "-" + producao.getRastreamento().getNumero().toString(), 
-							m.getCodigo(), 
-							medida.get(0).getUnidade(), 
-							medida.get(0).getValor());
-
-					materialProducaoRepository.saveAndFlush(p);
-					
-					MaterialLote lote = new MaterialLote(new MaterialLotePK(producao.getRastreamento().getTipo(), producao.getRastreamento().getNumero()), material.getCodigo(), m.getCodigo(), medida.get(0).getUnidade(), medida.get(0).getValor());
-					
-					materialLoteRepository.saveAndFlush(lote);
-
-					material.setEstoque(material.getEstoque().add(medida.get(0).getValor()));
-					materialRepository.saveAndFlush(material);
-
-				}
-
-			}
-
-		}
-
-		if (mensagem.getConsumo() != null && !mensagem.getConsumo().isEmpty()) {
-			
-			for (MaterialMsg consumo : mensagem.getConsumo()) {
+				MaterialMovimentoTipo movimentoTipo = materialMovimentoTipoRepository.findOne(materialMsg.getMovimentacao());
 				
-				Material material = materialRepository.findOne(consumo.getCodigo());
+				Material material = materialRepository.findOne(materialMsg.getCodigo());
 	
 				if (material != null) {
 					
-					List<MedidaMsg> medida = consumo.getMedida();
+					MaterialMovimentoItem item = new MaterialMovimentoItem(movimento.getId(), materialMsg.getMovimentacao(), materialMsg.getCodigo(), materialMsg.getLote().getTipo(), materialMsg.getLote().getNumero(), materialMsg.getEmUso(), materialMsg.getLocal());
 
-					Medida m = medidaRepository.findByDescricao(medida.get(0).getMedida());
-	
-					if (m != null) {
-	
-						MaterialLote lote = materialLoteRepository.findOne(new MaterialLotePK(consumo.getRastreamento().getTipo(), consumo.getRastreamento().getNumero()));
+					materialMovimentoItemRepository.saveAndFlush(item);
+					
+					MaterialLote lote = materialLoteRepository.findOne(new MaterialLotePK(materialMsg.getLote().getTipo(), materialMsg.getLote().getNumero()));
+					
+					if (lote != null) {
 						
-						if (lote != null) {
-							lote.setValor(lote.getValor().subtract(medida.get(0).getValor()));
-							materialLoteRepository.saveAndFlush(lote);
-						} else {
-							System.out.println(String.format(
-									"\n****************************************************************************\n -----> NAO ENCONTROU LOTE: %s-%s\n****************************************************************************\n", consumo.getRastreamento().getTipo(), consumo.getRastreamento().getNumero().toString()));
+						if (movimentoTipo.getOperacao().toUpperCase().startsWith("E")) {
+							lote.setLocal(materialMsg.getLocal());
 						}
 						
-						MaterialConsumo c = new MaterialConsumo(
-								mov.getId(),
-								consumo.getCodigo(), 
-								consumo.getRastreamento().getTipo() + "-" + consumo.getRastreamento().getNumero().toString(), 
-								m.getCodigo(), 
-								medida.get(0).getUnidade(), 
-								medida.get(0).getValor());
-	
-						materialConsumoRepository.saveAndFlush(c);
+					} else {
 						
-						material.setEstoque(material.getEstoque().subtract(medida.get(0).getValor()));
-						materialRepository.saveAndFlush(material);
+						if (movimentoTipo.getGerarLote()) {
+							lote = new MaterialLote(new MaterialLotePK(materialMsg.getLote().getTipo(), materialMsg.getLote().getNumero()), material.getCodigo(), materialMsg.getLocal());
+						} else {
+							System.out.println(String.format(
+								"\n****************************************************************************\n -----> NAO ENCONTROU/GEROU LOTE: %s-%s\n****************************************************************************\n", materialMsg.getLote().getTipo(), materialMsg.getLote().getNumero().toString()));
+						}
 					}
-				}
-			}
-			
-		}
-		
-		if (mensagem.getPerda() != null) {
-			
-			MaterialMsg perda = mensagem.getPerda();
 
-			Material material = materialRepository.findOne(perda.getCodigo());
-
-			if (material != null) {
-				
-				List<MedidaMsg> medida = perda.getMedida();
-
-				Medida m = medidaRepository.findByDescricao(medida.get(0).getMedida());
-
-				if (m != null) {
-
-					MaterialPerda p = new MaterialPerda(
-							mov.getId(),
-							perda.getCodigo(), 
-							perda.getRastreamento().getTipo() + "-" + perda.getRastreamento().getNumero().toString(), 
-							m.getCodigo(), 
-							medida.get(0).getUnidade(), 
-							medida.get(0).getValor());
-
-					materialPerdaRepository.saveAndFlush(p);
-					
-					MaterialLote lote = new MaterialLote(new MaterialLotePK(perda.getRastreamento().getTipo(), perda.getRastreamento().getNumero()), material.getCodigo(), m.getCodigo(), medida.get(0).getUnidade(), medida.get(0).getValor());
-					
 					materialLoteRepository.saveAndFlush(lote);
 
-					material.setEstoque(material.getEstoque().subtract(medida.get(0).getValor()));
-					materialRepository.saveAndFlush(material);
+					for (MedidaMsg medidaMsg : materialMsg.getMedidas()) {
+						
+						Medida medida = medidaRepository.findByDescricao(medidaMsg.getMedida());
+						
+						if (medida != null) {
+							
+							MaterialLoteMedida loteMedida = materialLoteMedidaRepository.findOne(new MaterialLoteMedidaPK(materialMsg.getLote().getTipo(), materialMsg.getLote().getNumero(), medida.getCodigo()));
 
+							if (loteMedida == null) {
+								
+								loteMedida = new MaterialLoteMedida(new MaterialLoteMedidaPK(materialMsg.getLote().getTipo(), materialMsg.getLote().getNumero(), medida.getCodigo()), medidaMsg.getUnidade(), medidaMsg.getValor());
+							
+							} else {
+								
+								if (movimentoTipo.getAlteraSaldoLote()) {
+									
+									if (movimentoTipo.getOperacao().toUpperCase().startsWith("E")) {
+										loteMedida.setValor(loteMedida.getValor().add(medidaMsg.getValor()));
+									} else {
+										loteMedida.setValor(loteMedida.getValor().subtract(medidaMsg.getValor()));
+									}
+
+								}									
+							}
+							
+							materialLoteMedidaRepository.saveAndFlush(loteMedida);
+
+							MaterialMovimentoItemMedida itemMedida = new MaterialMovimentoItemMedida(item.getId(), medida, medidaMsg.getUnidade(), medidaMsg.getValor());
+							
+							materialMovimentoItemMedidaRepository.saveAndFlush(itemMedida);
+							
+							if (movimentoTipo.getAlteraSaldoMaterial()) {
+								
+								if (movimentoTipo.getOperacao().toUpperCase().startsWith("E")) {
+									material.setEstoque(material.getEstoque().add(medidaMsg.getValor()));
+									
+								} else {
+									material.setEstoque(material.getEstoque().subtract(medidaMsg.getValor()));
+								}
+								
+								materialRepository.saveAndFlush(material);
+							}
+							
+						} else {
+							System.out.println(String.format(
+									"\n****************************************************************************\n -----> NAO ENCONTROU MEDIDA: %s\n****************************************************************************\n", medidaMsg.getMedida()));
+						}
+						
+					}
+					
+				} else {
+					System.out.println(String.format(
+							"\n****************************************************************************\n -----> NAO ENCONTROU MATERIAL: %s\n****************************************************************************\n", materialMsg.getCodigo()));
 				}
-
 			}
-
 		}
 
-	}
-
-	@JmsListener(destination = "IHM-MATERIAL-TRANSFORMACAO")
-	public void materialTransformacao(String msg) throws JsonParseException,
-			JsonMappingException, IOException {
-		System.out.println(String.format(
-				"CHEGOU MENSAGEM DE IHM-MATERIAL-TRANSFORMACAO: %s", msg));
-		ObjectMapper mapper = new ObjectMapper();
-		Map<String, Object> message = mapper.readValue(msg, Map.class);
 	}
 
 }

@@ -1,11 +1,8 @@
 package br.com.altamira.material.model;
 
 import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -13,13 +10,8 @@ import javax.persistence.Transient;
 @Table(name = "MATERIAL_MEDIDA")
 public class MaterialMedida {
 
-	@Id
-	@Column(name = "CODIGO")
-	private String codigo;
-	
-	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "MEDIDA", nullable = false)
-	private Medida medida;
+	@EmbeddedId
+	private MaterialMedidaPK id;
 	
 	@Column(name = "UNIDADE")
 	private String unidade;
@@ -30,20 +22,25 @@ public class MaterialMedida {
 	@Transient
 	private Double valor;
 	
-	public String getCodigo() {
-		return codigo;
+	public MaterialMedida() {
+		super();
 	}
 
-	public void setCodigo(String codigo) {
-		this.codigo = codigo;
+	public MaterialMedida(MaterialMedidaPK id, String unidade,
+			String expressao, Double valor) {
+		super();
+		this.id = id;
+		this.unidade = unidade;
+		this.expressao = expressao;
+		this.valor = valor;
 	}
 
-	public Medida getMedida() {
-		return medida;
+	public MaterialMedidaPK getId() {
+		return id;
 	}
 
-	public void setMedida(Medida medida) {
-		this.medida = medida;
+	public void setId(MaterialMedidaPK id) {
+		this.id = id;
 	}
 
 	public String getUnidade() {

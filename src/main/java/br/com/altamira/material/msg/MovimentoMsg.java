@@ -1,9 +1,9 @@
 package br.com.altamira.material.msg;
 
 import java.util.Date;
+import java.util.List;
 
-
-public class MaterialCadastroMsg {
+public class MovimentoMsg {
 
 	private String maquina;
 	
@@ -11,7 +11,9 @@ public class MaterialCadastroMsg {
 	
 	private String operador;
 	
-	private MaterialMsg material;
+	private OrdemProducaoMsg ordem;
+	
+	private List<MaterialMsg> materiais;
 
 	public String getMaquina() {
 		return maquina;
@@ -37,12 +39,20 @@ public class MaterialCadastroMsg {
 		this.operador = operador;
 	}
 
-	public MaterialMsg getMaterial() {
-		return material;
+	public OrdemProducaoMsg getOrdem() {
+		return ordem;
 	}
 
-	public void setMaterial(MaterialMsg material) {
-		this.material = material;
+	public void setOrdem(OrdemProducaoMsg ordem) {
+		this.ordem = ordem;
+	}
+
+	public List<MaterialMsg> getMateriais() {
+		return materiais;
+	}
+
+	public void setMateriais(List<MaterialMsg> materiais) {
+		this.materiais = materiais;
 	}
 	
 }

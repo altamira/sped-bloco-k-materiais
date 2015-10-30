@@ -23,51 +23,26 @@ public class MaquinaLog {
 	@Column(name = "MAQUINA")
 	private String maquina;
 	
-	@Column(name = "DATAHORA", insertable = false, updatable = false)
+	@Column(name = "DATAHORA")
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date datahora;
 	
 	@Column(name = "MODO")
 	private int modo;
 	
+	@Column(name = "TEMPO")
+	private int tempo;
+	
 	@Column(name = "OPERADOR")
 	private String operador;
-	
-	@Column(name = "TORQUE_MIN")
-	private int torqueMin;
-	
-	@Column(name = "TORQUE_MAX")
-	private int torqueMax;
-	
-	@Column(name = "CORRENTE_MIN")
-	private int correnteMin;
-	
-	@Column(name = "CORRENTE_MAX")
-	private int correnteMax;
-	
-	@Column(name = "TEMP_MIN")
-	private int temperaturaMin;
-	
-	@Column(name = "TEMP_MAX")
-	private int temperaturaMax;
-	
-	@Column(name = "UPTIME")
-	private int uptime;
 
-	public MaquinaLog(String maquina, int modo, String operador, int torqueMin,
-			int torqueMax, int correnteMin, int correnteMax,
-			int temperaturaMin, int temperaturaMax, int uptime) {
+	public MaquinaLog(String maquina, Date datahora, int modo, int tempo, String operador) {
 		super();
 		this.maquina = maquina;
+		this.datahora = datahora;
 		this.modo = modo;
+		this.tempo = tempo;
 		this.operador = operador;
-		this.torqueMin = torqueMin;
-		this.torqueMax = torqueMax;
-		this.correnteMin = correnteMin;
-		this.correnteMax = correnteMax;
-		this.temperaturaMin = temperaturaMin;
-		this.temperaturaMax = temperaturaMax;
-		this.uptime = uptime;
 	}
 
 	public long getId() {
@@ -110,60 +85,12 @@ public class MaquinaLog {
 		this.operador = operador;
 	}
 
-	public int getTorqueMin() {
-		return torqueMin;
+	public int getTempo() {
+		return tempo;
 	}
 
-	public void setTorqueMin(int torqueMin) {
-		this.torqueMin = torqueMin;
-	}
-
-	public int getTorqueMax() {
-		return torqueMax;
-	}
-
-	public void setTorqueMax(int torqueMax) {
-		this.torqueMax = torqueMax;
-	}
-
-	public int getCorrenteMin() {
-		return correnteMin;
-	}
-
-	public void setCorrenteMin(int correnteMin) {
-		this.correnteMin = correnteMin;
-	}
-
-	public int getCorrenteMax() {
-		return correnteMax;
-	}
-
-	public void setCorrenteMax(int correnteMax) {
-		this.correnteMax = correnteMax;
-	}
-
-	public int getTemperaturaMin() {
-		return temperaturaMin;
-	}
-
-	public void setTemperaturaMin(int temperaturaMin) {
-		this.temperaturaMin = temperaturaMin;
-	}
-
-	public int getTemperaturaMax() {
-		return temperaturaMax;
-	}
-
-	public void setTemperaturaMax(int temperaturaMax) {
-		this.temperaturaMax = temperaturaMax;
-	}
-
-	public int getUptime() {
-		return uptime;
-	}
-
-	public void setUptime(int uptime) {
-		this.uptime = uptime;
+	public void setTempo(int tempo) {
+		this.tempo = tempo;
 	}
 	
 }

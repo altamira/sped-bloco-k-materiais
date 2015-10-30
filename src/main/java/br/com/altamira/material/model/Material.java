@@ -9,6 +9,8 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinColumns;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
@@ -31,13 +33,12 @@ public class Material {
 	@Column(name = "ESTOQUE")
 	private BigDecimal estoque;
 	
-	/*
-	@OneToMany(mappedBy = "codigo", fetch = FetchType.EAGER)
-	private List<MaterialMedida> medida;
-	*/
+//	@OneToMany(/*mappedBy = "id",*/ fetch = FetchType.EAGER)
+//    @JoinColumn(name = "medida", referencedColumnName = "MATERIAL")
+//	private List<MaterialMedida> medidas;
 
 	@OneToMany(mappedBy = "material", fetch = FetchType.EAGER)
-	private List<MaterialComponente> componente;
+	private List<MaterialComponente> componentes;
 	
 	@Transient
 	private Map<String, BigDecimal> variavel = new HashMap<String, BigDecimal>();
@@ -66,12 +67,20 @@ public class Material {
 		this.tipo = tipo;
 	}
 
-	public List<MaterialComponente> getComponente() {
-		return componente;
+	/*public List<MaterialMedida> getMedidas() {
+		return medidas;
 	}
 
-	public void setComponente(List<MaterialComponente> componente) {
-		this.componente = componente;
+	public void setMedidas(List<MaterialMedida> medidas) {
+		this.medidas = medidas;
+	}*/
+
+	public List<MaterialComponente> getComponentes() {
+		return componentes;
+	}
+
+	public void setComponentes(List<MaterialComponente> componentes) {
+		this.componentes = componentes;
 	}
 
 	public Map<String, BigDecimal> getVariavel() {

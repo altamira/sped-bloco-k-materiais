@@ -1,10 +1,13 @@
 package br.com.altamira.material.msg;
 
 import java.util.List;
+import java.util.Set;
 
 public class MaterialMsg {
 
-	private RastreamentoMsg rastreamento;
+	private String movimentacao;
+	
+	private LoteMsg lote;
 	
 	private String codigo;
 	
@@ -14,14 +17,22 @@ public class MaterialMsg {
 	
 	private String local;
 	
-	private List<MedidaMsg> medida;
+	private Set<MedidaMsg> medidas;
 
-	public RastreamentoMsg getRastreamento() {
-		return rastreamento;
+	public String getMovimentacao() {
+		return movimentacao;
 	}
 
-	public void setRastreamento(RastreamentoMsg rastreamento) {
-		this.rastreamento = rastreamento;
+	public void setMovimentacao(String movimentacao) {
+		this.movimentacao = movimentacao;
+	}
+
+	public LoteMsg getLote() {
+		return lote;
+	}
+
+	public void setLote(LoteMsg lote) {
+		this.lote = lote;
 	}
 
 	public String getCodigo() {
@@ -56,12 +67,12 @@ public class MaterialMsg {
 		this.local = local;
 	}
 
-	public List<MedidaMsg> getMedida() {
-		return medida;
+	public Set<MedidaMsg> getMedidas() {
+		return medidas;
 	}
 
-	public void setMedida(List<MedidaMsg> medida) {
-		this.medida = medida;
+	public void setMedidas(Set<MedidaMsg> medidas) {
+		this.medidas = medidas;
 	}
 
 }

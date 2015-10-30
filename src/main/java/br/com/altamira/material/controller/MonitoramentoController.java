@@ -2,7 +2,6 @@ package br.com.altamira.material.controller;
 
 import java.io.IOException;
 import java.util.Date;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -11,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 
 import br.com.altamira.material.model.MaquinaLog;
+import br.com.altamira.material.msg.MonitoramentoMsg;
 import br.com.altamira.material.repository.MaquinaLogRepository;
 import br.com.altamira.material.repository.MaquinaRepository;
 
@@ -34,44 +34,19 @@ public class MonitoramentoController {
 	@Transactional
 	@JmsListener(destination = "IHM-STATUS")
 	public void monitoramentoStatus(String msg) throws JsonParseException, JsonMappingException, IOException {
-		System.out.println(String.format("CHEGOU MENSAGEM DE IHM-STATUS: %s", msg));
+		System.out.println(String.format(
+				"\n--------------------------------------------------------------------------------\nCHEGOU MENSAGEM DE IHM-STATUS\n--------------------------------------------------------------------------------\n%s\n--------------------------------------------------------------------------------\n", msg));
 		
 		ObjectMapper mapper = new ObjectMapper();
-		
-		@SuppressWarnings("unchecked")
-		Map<String, Object> mensagem = mapper.readValue(msg, Map.class);
-		
-		@SuppressWarnings("unchecked")
-		Map<String, Object> parametros = mapper.convertValue(mensagem.get("parametros"), Map.class);
-		
-		@SuppressWarnings("unchecked")
-		Map<String, Object> status = mapper.convertValue(mensagem.get("status"), Map.class);
-		
-		String maquina = parametros.get("maquina").toString().toUpperCase();
-		
-		int modo = Integer.parseInt(mensagem.get("modo").toString());
-		
-		String operador = mensagem.get("usuario") == null ? "" : mensagem.get("usuario").toString();
-		
-		Integer[] torque = mapper.convertValue(status.get("torque"), Integer[].class);
-		
-		Integer[] corrente = mapper.convertValue(status.get("corrente"), Integer[].class);
-		
-		Integer[] temperatura = mapper.convertValue(status.get("temperatura"), Integer[].class);
-		
-		int uptime = Integer.parseInt(status.get("uptime").toString());
+		MonitoramentoMsg monitoramentoMsg = mapper.readValue(msg, MonitoramentoMsg.class);
 		
 		MaquinaLog log = new MaquinaLog(
-				maquina,
-				modo,
-				operador,
-				torque[0],
-				torque[0],
-				corrente[0],
-				corrente[1],
-				temperatura[0],
-				temperatura[1],
-				uptime);
+				monitoramentoMsg.getMaquina().toUpperCase(),
+				monitoramentoMsg.getDatahora(),
+				monitoramentoMsg.getModo(),
+				monitoramentoMsg.getTempo(),
+				monitoramentoMsg.getOperador()
+				);
 		
 		maquinaLogRepository.saveAndFlush(log);
 		
@@ -80,7 +55,7 @@ public class MonitoramentoController {
         try {
             this.sendingTextWebSocketHandler.broadcastToSessions(new DataWithTimestamp<MaquinaLog>(log, approximateFirstReceiveTimestamp));
         } catch (IOException e) {
-        	System.out.println(String.format("Was not able to push the message to the client. %s", e));
+        	System.out.println(String.format("\n********************************************************************************\nWas not able to push the message to the client.\n********************************************************************************\n%s\n********************************************************************************\n", e.getMessage()));
         }
 		
 	}

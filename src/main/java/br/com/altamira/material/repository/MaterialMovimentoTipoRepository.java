@@ -4,10 +4,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import br.com.altamira.material.model.MovimentacaoEstoque;
+import br.com.altamira.material.model.MaterialMovimentoTipo;
 
 @Repository
 @Transactional
-public interface MovimentacaoEstoqueRepository extends JpaRepository<MovimentacaoEstoque, Long> {
-	
+public interface MaterialMovimentoTipoRepository extends JpaRepository<MaterialMovimentoTipo, String> {
+
 }

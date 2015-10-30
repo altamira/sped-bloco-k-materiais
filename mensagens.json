@@ -1,10 +1,11 @@
 0. MENSAGEM DE STATUS
 
 {
-"maquina": "IHMPPALETE",
+"maquina": "IHMAPLANGARRA",
 "datahora": "2015-10-29T12:25:43-0400",
-"modo": 2,
 "operador": "IRANILDO",
+"modo": 2,
+"tempo": 123131,
 "parametros": 
       [
         { "medida": "torque_medio", "unidade": "%", "valor": 300},
@@ -12,20 +13,50 @@
         { "medida": "corrente_media", "unidade": "A", "valor": 1.650000},
         { "medida": "corrente_maxima", "unidade": "A", "valor": 1.650000},
         { "medida": "temperatura_media", "unidade": "C", "valor": 0},
-        { "medida": "temperatura_maxima", "unidade": "C", "valor": 0},
-        { "medida": "tempo_ligado", "unidade": "s", "valor": 2154}
+        { "medida": "temperatura_maxima", "unidade": "C", "valor": 0}
       ]
 }
 
-1. MOVIMENTACAO FISICA DE ESTOQUE (NAO ALTERA QUANTIDADES/MEDIDAS)(ALTERA LOCAL/RESPONSAVEL)
+1. MOVIMENTACAO DE ESTOQUE (ALTERA QUANTIDADES/MEDIDAS/LOCAL/RESPONSAVEL)
 
 {
 "maquina": "IHMPPALETE",
 "datahora": "2015-10-29T12:25:43-0400",
 "operador": "IRANILDO",
-"material": 
+"ordem": 
+  {
+     "numero": 1234,
+     "criado": "",
+     "situacao": 0,
+     "material":
+     { 
+       "codigo": "PPLSIG14080170000000", "descricao": "LONGARINA SG120 CH14 F240 MED.2300MM", "medidas": [{ "medida": "quantidade", "unidade": "pc", "valor": 210}, { "medida": "peso", "unidade": "pc", "valor": 210}]
+     }
+  },
+"materiais": 
+  [{ 
+    "movimentacao": "CO", 
+    "lote": 
+      { 
+        "tipo": "05", 
+	"numero": 0
+      }, 
+    "codigo": "ALPCFF01008150000000", 
+    "descricao": "AÇO CHAPA FINA FRIO SAE1008/1010 C/ 1,50MM ESP", 
+    "emUso": false,
+    "local":"AE1",
+    "medidas": 
+      [
+        { "medida": "largura", "unidade": "mm", "valor": 300},
+        { "medida": "espessura", "unidade": "mm", "valor": 1.650000},
+        { "medida": "quantidade", "unidade": "pc", "valor": 0},
+        { "medida": "comprimento", "unidade": "mm", "valor": 0},
+        { "medida": "peso", "unidade": "kg", "valor": 12.000000}
+      ]
+  },
   { 
-    "rastreamento": 
+    "movimentacao": "PE", 
+    "lote": 
       { 
         "tipo": "01", 
 	"numero": "314700"
@@ -34,36 +65,184 @@
     "descricao": "AÇO CHAPA FINA FRIO SAE1008/1010 C/ 1,50MM ESP", 
     "emUso": false,
     "local":"AE1",
-    "medida": 
+    "medidas": 
       [
         { "medida": "largura", "unidade": "mm", "valor": 300},
         { "medida": "espessura", "unidade": "mm", "valor": 1.650000},
         { "medida": "quantidade", "unidade": "pc", "valor": 0},
         { "medida": "comprimento", "unidade": "mm", "valor": 0},
-        { "medida": "peso", "unidade": "kg", "valor": 2100.000000}
+        { "medida": "peso", "unidade": "kg", "valor": 12.000000}
       ]
-  }
+  }]
 }
 
-2. MOVIMENTACAO/TRANSFERENCIA DE ESTOQUES (ALTERA QUANTIDADES/MEDIDAS/TIPO ESTOQUE)(NAO ALTERA LOCAL/RESPONSAVEL)
+--------------------------------------------------------------------------
+CODIGOS DE MOVIMENTACAO DE MATERIAL
+--------------------------------------------------------------------------
 
+CODIGO DESCRICAO                                                                                            OPERACAO BALANCEADO
+------ ---------------------------------------------------------------------------------------------------- -------- ----------
+CO     SAIDA POR CONSUMO DE MATERIAL PROPRIO                                                                S        1
+D1     SAIDA POR MOVIMENTACAO DE MATERIAL ENTRE DEPOSITOS PROPRIO                                           S        1
+D2     ENTRADA POR MOVIMENTACAO DE MATERIAL ENTRE DEPOSITOS PROPRIOS                                        E        1
+DE     SAIDA POR DEVOLUCAO DE MATERIAL RECEBIDO DE TERCEIROS                                                S        1
+EI     ENTRADA POR AJUSTE DE INVENTARIO                                                                     E        0
+EX     SAIDA POR EXPEDICAO DE MATERIAL PROPRIO PARA TERCEIROS                                               S        0
+PE     SAIDA POR PERDA DE MATERIAL                                                                          S        0
+PR     ENTRADA POR PRODUCAO DE MATERIAL PROPRIO                                                             E        1
+RE     ENTRADA POR RECEBIMENTO DE MATERIAL DE TERCEIROS                                                     E        0
+SI     SAIDA POR AJUSTE DE INVENTARIO                                                                       S        0
+
+SAIDA ENTRADA
+--------------
+CO  ->  PR
+D1  ->  D2
+DE  ->  RE
+EX
+PE
+SI
+    ->  RE
+    ->  EI
+
+
+
+---------------------------------------------------------------------------
+CASOS DE USO
+---------------------------------------------------------------------------
+
+1. ENTRADA NO ALMOXARIFADO POR RECEBIMENTO DE MATERIAL DE TERCEIROS
+---------------------------------------------------------------------------
 {
-"maquina": "IHMPPALETE",
-"datahora": "2015-10-28T12:25:43.511Z",
-"operador": "IRANILDO",
-"producao": 
-  { 
-    "codigo": "PPLSIG14080170000000", "descricao": "LONGARINA SG120 CH14 F240 MED.2300MM", "rastreamento": { "tipo": "03", "numero": "4459"}, "medida": [{ "medida": "quantidade", "unidade": "pc", "valor": 210}, { "medida": "peso", "unidade": "pc", "valor": 1}]
-  },
-"consumo": 
-  [ 
-    { "codigo": "PPLGAR0LEVE080000000", "descricao": "GARRA NOVA PORTA-PALETE (D)", "rastreamento": { "tipo": "03", "numero": "7548"}, "medida": [{ "medida": "percentual", "unidade": "%", "valor": 1}]},
-    { "codigo": "PPLGAR0LEVE080000000", "descricao": "GARRA NOVA PORTA-PALETE (E)", "rastreamento": { "tipo": "03", "numero": "69582"}, "medida": [{ "medida": "quantidade", "unidade": "C", "valor": 1}]},
-    { "codigo": "PPLGAR0LEVE080000000",  "descricao": "PERFIL LONG SG120 CH14 F240 MED.#d#MM", "rastreamento": { "tipo": "03", "numero": "1231312"}, "medida": [{ "medida": "peso", "unidade": "kg", "valor": 1}]}
-  ],
-"perda": 
-  { 
-    "codigo": "ALPCFF01008150000000", "descricao": "AÇO CHAPA FINA FRIO SAE1008/1010 C/ 1,50MM ESP", "rastreamento": { "tipo": "03", "numero": "314700"}, "medida": [{ "medida": "peso", "unidade": "kg", "valor": 27.14}]
-  }
+"maquina": "IHMALMTAMAINDE",
+"datahora": "2015-10-29T12:25:43-0200",
+"operador": "NILSON",
+"materiais": 
+  [{ 
+    "movimentacao": "RE", 
+    "lote": 
+      { 
+        "tipo": "01", 
+	"numero": 415
+      }, 
+    "codigo": "ALPRFQ30-KG20000F240", 
+    "descricao": "AÇO LAM PLANO FINA QUENTE PRETO ROLO 30KG/MM2 2,00MM ESP FITA 240MM", 
+    "emUso": false,
+    "local":"TAMAINDE-ALMOXARIFADO-E1",
+    "medidas": 
+      [
+        { "medida": "largura", "unidade": "mm", "valor": 240},
+        { "medida": "espessura", "unidade": "mm", "valor": 2.000000},
+        { "medida": "quantidade", "unidade": "pc", "valor": 1},
+        { "medida": "peso", "unidade": "kg", "valor": 2515.861}
+      ]
+  }]
 }
+
+1. RETIRA A BOBINA DO ALMOXARIFADO E COLOCA NA MÁQUINA COLUNA SIGMA
+---------------------------------------------------------------------------
+{
+"maquina": "IHMSIGMA",
+"datahora": "2015-10-29T14:13:56-0200",
+"operador": "IRANILDO",
+"materiais": 
+  [{ 
+    "movimentacao": "D2", 
+    "lote": 
+      { 
+        "tipo": "01", 
+	"numero": 415
+      }, 
+    "codigo": "ALPRFQ30-KG20000F240", 
+    "descricao": "AÇO LAM PLANO FINA QUENTE PRETO ROLO 30KG/MM2 2,00MM ESP FITA 240MM", 
+    "emUso": true,
+    "local":"TAMAINDE-COLUNA-SIGMA-E1",
+    "medidas": 
+      [
+        { "medida": "largura", "unidade": "mm", "valor": 240},
+        { "medida": "espessura", "unidade": "mm", "valor": 2.000000},
+        { "medida": "quantidade", "unidade": "pc", "valor": 1},
+        { "medida": "peso", "unidade": "kg", "valor": 2515.861}
+      ]
+  },
+  { 
+    "movimentacao": "D1", 
+    "lote": 
+      { 
+        "tipo": "01", 
+	"numero": 415
+      }, 
+    "codigo": "ALPRFQ30-KG20000F240", 
+    "descricao": "AÇO LAM PLANO FINA QUENTE PRETO ROLO 30KG/MM2 2,00MM ESP FITA 240MM", 
+    "emUso": false,
+    "local":"TAMAINDE-ALMOXARIFADO-E1",
+    "medidas": 
+      [
+        { "medida": "largura", "unidade": "mm", "valor": 240},
+        { "medida": "espessura", "unidade": "mm", "valor": 2.000000},
+        { "medida": "quantidade", "unidade": "pc", "valor": 1},
+        { "medida": "peso", "unidade": "kg", "valor": 2515.861}
+      ]
+  }]
+}
+
+
+2. PRODUZIR PERFIL LONG SG120 CH14 F240 2300MM
+---------------------------------------------------------------------------
+{
+"maquina": "IHMSIGMA",
+"datahora": "2015-10-29T12:25:43-0400",
+"operador": "IRANILDO",
+"ordem": 
+  {
+     "numero": 73850,
+     "criado": "HELIO",
+     "situacao": 1,
+     "material":
+     { 
+       "codigo": "PPPSIG14120240000000", "descricao": "PERFIL LONG SG120 CH14 F240 2300MM", 
+	"medidas": 
+   	   [
+   	     { "medida": "largura", "unidade": "mm", "valor": 240},
+   	     { "medida": "espessura", "unidade": "mm", "valor": 2.000000},
+   	     { "medida": "quantidade", "unidade": "pc", "valor": 125},
+   	     { "medida": "comprimento", "unidade": "mm", "valor": 2300.000}
+      ]
+     }
+  },
+"materiais": 
+  [{ 
+    "movimentacao": "PR", 
+    "lote": 
+      { 
+        "tipo": "03", 
+	"numero": 3657
+      }, 
+    "codigo": "PPPSIG14120240000000", 
+    "descricao": "PERFIL LONG SG120 CH14 F240 2300MM", 
+    "emUso": false,
+    "local":"TAMAINDE-COLUNA-SIGMA-E1",
+    "medidas": 
+      [
+        { "medida": "quantidade", "unidade": "pc", "valor": 1},
+        { "medida": "peso", "unidade": "kg", "valor": 17.2438}
+      ]
+  },
+  { 
+    "movimentacao": "CO", 
+    "lote": 
+      { 
+        "tipo": "01", 
+	"numero": 415
+      }, 
+    "codigo": "ALPRFQ30-KG20000F240", 
+    "descricao": "AÇO LAM PLANO FINA QUENTE PRETO ROLO 30KG/MM2 2,00MM ESP FITA 240MM", 
+    "emUso": true,
+    "local":"TAMAINDE-COLUNA-SIGMA-E1",
+    "medidas": 
+      [
+        { "medida": "peso", "unidade": "kg", "valor": 17.2438}
+      ]
+  }]
+}
+
 

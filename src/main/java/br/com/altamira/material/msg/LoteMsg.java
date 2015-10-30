@@ -1,6 +1,6 @@
 package br.com.altamira.material.msg;
 
-public class RastreamentoMsg {
+public class LoteMsg {
 
 	private String tipo;
 	
