@@ -63,7 +63,7 @@ public class MaterialLoteMedida {
 		if (other instanceof Medida) {
 			Medida castOther = (Medida)other;
 			return 
-				this.id.getMedida().equals(castOther.getCodigo());			
+				this.id.getMedida().equals(castOther.getNome());			
 		}
 		if (!(other instanceof MaterialLoteMedida)) {
 			return false;

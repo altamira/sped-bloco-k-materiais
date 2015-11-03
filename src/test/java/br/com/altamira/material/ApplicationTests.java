@@ -1,4 +1,4 @@
-package br.com.altamira.data;
+package br.com.altamira.material;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

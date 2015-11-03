@@ -11,4 +11,6 @@ import br.com.altamira.material.model.Medida;
 public interface MedidaRepository extends JpaRepository<Medida, String> {
 
 	Medida findByDescricao(String descricao);
+	Medida findByNome(String nome);
+	Medida findByVariavel(String variavel);
 }

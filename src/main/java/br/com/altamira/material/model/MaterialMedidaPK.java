@@ -13,30 +13,32 @@ public class MaterialMedidaPK implements Serializable {
 	//default serial version id, required for serializable classes.
 	private static final long serialVersionUID = 1L;
 
-	@Column(name="MATERIAL")
-	private String material;
+	//@Column(name="MATERIAL")
+	@OneToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "MATERIAL", referencedColumnName = "CODIGO", nullable = false)
+	private Material material;
 
-	/*@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "MEDIDA", nullable = false)*/
-	@Column(name = "MEDIDA")
-	private String medida;
+	@OneToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "MEDIDA", referencedColumnName = "NOME", nullable = false)
+	//@Column(name = "MEDIDA")
+	private Medida medida;
 
 	public MaterialMedidaPK() {
 	}
 
-	public String getMaterial() {
+	public Material getMaterial() {
 		return material;
 	}
 
-	public void setMaterial(String material) {
+	public void setMaterial(Material material) {
 		this.material = material;
 	}
 
-	public String getMedida() {
+	public Medida getMedida() {
 		return medida;
 	}
 
-	public void setMedida(String medida) {
+	public void setMedida(Medida medida) {
 		this.medida = medida;
 	}
 

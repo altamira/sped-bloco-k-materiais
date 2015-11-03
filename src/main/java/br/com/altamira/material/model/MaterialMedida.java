@@ -1,5 +1,7 @@
 package br.com.altamira.material.model;
 
+import java.math.BigDecimal;
+
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
@@ -16,22 +18,22 @@ public class MaterialMedida {
 	@Column(name = "UNIDADE")
 	private String unidade;
 	
-	@Column(name = "VALOR")
-	private String expressao;
+	@Column(name = "FORMULA")
+	private String formula;
 
 	@Transient
-	private Double valor;
+	private BigDecimal valor;
 	
 	public MaterialMedida() {
 		super();
 	}
 
 	public MaterialMedida(MaterialMedidaPK id, String unidade,
-			String expressao, Double valor) {
+			String formula, BigDecimal valor) {
 		super();
 		this.id = id;
 		this.unidade = unidade;
-		this.expressao = expressao;
+		this.formula = formula;
 		this.valor = valor;
 	}
 
@@ -51,19 +53,19 @@ public class MaterialMedida {
 		this.unidade = unidade;
 	}
 
-	public String getExpressao() {
-		return expressao;
+	public String getFormula() {
+		return formula;
 	}
 
-	public void setExpressao(String expressao) {
-		this.expressao = expressao;
+	public void setFormula(String formula) {
+		this.formula = formula;
 	}
 
-	public Double getValor() {
+	public BigDecimal getValor() {
 		return valor;
 	}
 
-	public void setValor(Double valor) {
+	public void setValor(BigDecimal valor) {
 		this.valor = valor;
 	}
 		

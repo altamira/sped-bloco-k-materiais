@@ -2,9 +2,10 @@ package br.com.altamira.material.model;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -29,16 +30,18 @@ public class Material {
 	
 	@Column(name = "TIPO", nullable = false)
 	private String tipo;
-
-	@Column(name = "ESTOQUE")
-	private BigDecimal estoque;
 	
-//	@OneToMany(/*mappedBy = "id",*/ fetch = FetchType.EAGER)
-//    @JoinColumn(name = "medida", referencedColumnName = "MATERIAL")
-//	private List<MaterialMedida> medidas;
+	@OneToMany(/*mappedBy = "id",*/ fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	//@JoinColumns({
+	@JoinColumn(name = "MATERIAL", referencedColumnName = "CODIGO")
+	//    })
+	private Set<MaterialMedida> medidas;
 
-	@OneToMany(mappedBy = "material", fetch = FetchType.EAGER)
-	private List<MaterialComponente> componentes;
+	@OneToMany(/*mappedBy = "id",*/ fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	//@JoinColumns({
+	@JoinColumn(name = "MATERIAL", referencedColumnName = "CODIGO")
+	//    })
+	private Set<MaterialComponente> componentes;
 	
 	@Transient
 	private Map<String, BigDecimal> variavel = new HashMap<String, BigDecimal>();
@@ -67,19 +70,19 @@ public class Material {
 		this.tipo = tipo;
 	}
 
-	/*public List<MaterialMedida> getMedidas() {
+	public Set<MaterialMedida> getMedidas() {
 		return medidas;
 	}
 
-	public void setMedidas(List<MaterialMedida> medidas) {
+	public void setMedidas(Set<MaterialMedida> medidas) {
 		this.medidas = medidas;
-	}*/
+	}
 
-	public List<MaterialComponente> getComponentes() {
+	public Set<MaterialComponente> getComponentes() {
 		return componentes;
 	}
 
-	public void setComponentes(List<MaterialComponente> componentes) {
+	public void setComponentes(Set<MaterialComponente> componentes) {
 		this.componentes = componentes;
 	}
 
@@ -89,14 +92,6 @@ public class Material {
 
 	public void setVariavel(Map<String, BigDecimal> variavel) {
 		this.variavel = variavel;
-	}
-
-	public BigDecimal getEstoque() {
-		return estoque;
-	}
-
-	public void setEstoque(BigDecimal estoque) {
-		this.estoque = estoque;
 	}
 	
 }

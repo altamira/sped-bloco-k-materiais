@@ -1,6 +1,5 @@
 package br.com.altamira.material.msg;
 
-import java.util.List;
 import java.util.Set;
 
 public class MaterialMsg {

@@ -10,21 +10,24 @@ import javax.persistence.Table;
 public class Medida {
 
 	@Id
-	@Column(name = "CODIGO")
-	private String codigo;
+	@Column(name = "NOME")
+	private String nome;
 	
 	@Column(name = "DESCRICAO")
 	private String descricao;
 	
-	@Column(name = "UNIDADE")
+	@Column(name = "UNIDADE_PADRAO")
 	private String unidade;
+	
+	@Column(name = "VARIAVEL")
+	private String variavel;
 
-	public String getCodigo() {
-		return codigo;
+	public String getNome() {
+		return nome;
 	}
 
-	public void setCodigo(String codigo) {
-		this.codigo = codigo;
+	public void setNome(String nome) {
+		this.nome = nome;
 	}
 
 	public String getDescricao() {
@@ -41,6 +44,14 @@ public class Medida {
 
 	public void setUnidade(String unidade) {
 		this.unidade = unidade;
+	}
+
+	public String getVariavel() {
+		return variavel;
+	}
+
+	public void setVariavel(String variavel) {
+		this.variavel = variavel;
 	}
 		
 }

@@ -7,10 +7,12 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import br.com.altamira.material.model.MaterialComponente;
+import br.com.altamira.material.model.MaterialComponentePK;
 
 @Repository
 @Transactional
-public interface MaterialComponenteRepository extends JpaRepository<MaterialComponente, String> {
+public interface MaterialComponenteRepository extends JpaRepository<MaterialComponente, MaterialComponentePK> {
 
-	List<MaterialComponente> findAllByMaterialCodigo(String codigo);
+	List<MaterialComponente> findAllByIdMaterialCodigo(String codigo);
+	List<MaterialComponente> findAllByIdComponenteCodigo(String codigo);
 }

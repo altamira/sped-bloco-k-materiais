@@ -186,7 +186,7 @@ CASOS DE USO
 }
 
 
-2. PRODUZIR PERFIL LONG SG120 CH14 F240 2300MM
+2. PRODUZIU 1 pc DE PERFIL LONG SG120 CH14 F240 2300MM, QUANT. OP 125 PCS
 ---------------------------------------------------------------------------
 {
 "maquina": "IHMSIGMA",
@@ -223,8 +223,11 @@ CASOS DE USO
     "local":"TAMAINDE-COLUNA-SIGMA-E1",
     "medidas": 
       [
+        { "medida": "largura", "unidade": "mm", "valor": 240},
+        { "medida": "espessura", "unidade": "mm", "valor": 2.000000},
         { "medida": "quantidade", "unidade": "pc", "valor": 1},
-        { "medida": "peso", "unidade": "kg", "valor": 17.2438}
+        { "medida": "comprimento", "unidade": "mm", "valor": 2293.000},
+        { "medida": "peso", "unidade": "kg", "valor": 8.673024}
       ]
   },
   { 
@@ -240,7 +243,28 @@ CASOS DE USO
     "local":"TAMAINDE-COLUNA-SIGMA-E1",
     "medidas": 
       [
-        { "medida": "peso", "unidade": "kg", "valor": 17.2438}
+        { "medida": "comprimento", "unidade": "mm", "valor": 2301.000},
+        { "medida": "peso", "unidade": "kg", "valor": 8.70319104},
+      ]
+  },
+  { 
+    "movimentacao": "PE", 
+    "lote": 
+      { 
+        "tipo": "01", 
+	"numero": 415
+      }, 
+    "codigo": "ALPRFQ30-KG20000F240", 
+    "descricao": "AÇO LAM PLANO FINA QUENTE PRETO ROLO 30KG/MM2 2,00MM ESP FITA 240MM", 
+    "emUso": false,
+    "local":"TAMAINDE-COLUNA-SIGMA-E1",
+    "medidas": 
+      [
+        { "medida": "largura", "unidade": "mm", "valor": 240},
+        { "medida": "espessura", "unidade": "mm", "valor": 2.000000},
+        { "medida": "quantidade", "unidade": "pc", "valor": 1},
+        { "medida": "comprimento", "unidade": "mm", "valor": 8.000},
+        { "medida": "peso", "unidade": "kg", "valor": 0,03016704}
       ]
   }]
 }
