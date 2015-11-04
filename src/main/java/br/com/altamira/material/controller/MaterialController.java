@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Stack;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +16,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import br.com.altamira.data.wbccad.model.Prdorc;
 import br.com.altamira.material.expression.Expression;
+import br.com.altamira.material.model.ConversaoUnidade;
+import br.com.altamira.material.model.ConversaoUnidadePK;
 import br.com.altamira.material.model.Material;
 import br.com.altamira.material.model.MaterialComponente;
 import br.com.altamira.material.model.MaterialLote;
@@ -26,9 +30,11 @@ import br.com.altamira.material.model.MaterialMovimentoItem;
 import br.com.altamira.material.model.MaterialMovimentoItemMedida;
 import br.com.altamira.material.model.MaterialMovimentoTipo;
 import br.com.altamira.material.model.Medida;
+import br.com.altamira.material.model.Unidade;
 import br.com.altamira.material.msg.MaterialMsg;
 import br.com.altamira.material.msg.MedidaMsg;
 import br.com.altamira.material.msg.MovimentoMsg;
+import br.com.altamira.material.repository.ConversaoUnidadeRepository;
 import br.com.altamira.material.repository.MaterialComponenteRepository;
 import br.com.altamira.material.repository.MaterialLoteMedidaRepository;
 import br.com.altamira.material.repository.MaterialLoteRepository;
@@ -39,6 +45,7 @@ import br.com.altamira.material.repository.MaterialMovimentoRepository;
 import br.com.altamira.material.repository.MaterialMovimentoTipoRepository;
 import br.com.altamira.material.repository.MaterialRepository;
 import br.com.altamira.material.repository.MedidaRepository;
+import br.com.altamira.material.repository.UnidadeRepository;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -76,6 +83,12 @@ public class MaterialController {
 	
 	@Autowired
 	private MaterialMovimentoTipoRepository materialMovimentoTipoRepository;
+	
+	@Autowired 
+	private ConversaoUnidadeRepository conversaoUnidadeRepository;
+	
+	@Autowired
+	private UnidadeRepository unidadeRepository;
 
 	/**
 	 * Importa lista de materiais
@@ -97,8 +110,36 @@ public class MaterialController {
 		System.out.println("Gravado ID " + stored.getCodigo());
 	}
 
+	private BigDecimal converteUnidade(String unidadeOrigem, String unidadeDestino, BigDecimal valor) throws Exception {
+		if (unidadeOrigem.equalsIgnoreCase(unidadeDestino)) {
+			return valor;
+		}
+		
+		Unidade uOrigem = unidadeRepository.findBySimbolo(unidadeOrigem);
+
+		if (uOrigem == null) {
+			throw new Exception(String.format("NAO ENCONTROU A UNIDADE DE MEDIDA %s", unidadeOrigem));
+		}
+		
+		Unidade uDestino = unidadeRepository.findBySimbolo(unidadeDestino);
+		
+		if (uDestino == null) {
+			throw new Exception(String.format("NAO ENCONTROU A UNIDADE DE MEDIDA %s", unidadeDestino));
+		}
+		
+		ConversaoUnidade convesaoUnidade = conversaoUnidadeRepository.findById(new ConversaoUnidadePK(uOrigem, uDestino));
+		
+		if (convesaoUnidade == null) {
+			throw new Exception(String.format("NAO ENCONTROU UMA CONVERSAO DE UNIDADES COMPATIVEL COM [%s <-> %s]", unidadeOrigem, unidadeDestino));
+		}
+		
+		BigDecimal valorConvertido = valor.multiply(convesaoUnidade.getFator());
+		
+		return valorConvertido;
+	}
+	
 	@JmsListener(destination = "MATERIAL-MEDIDAS")
-	public void calculaMaterialMedidas(String msg) throws JsonParseException, JsonMappingException, IOException {
+	public void calculaMaterialMedidas(String msg) throws Exception {
 		ObjectMapper mapper = new ObjectMapper();
 		MaterialMsg materialMsg = mapper.readValue(msg, MaterialMsg.class);
 		
@@ -118,14 +159,16 @@ public class MaterialController {
 				medida = medidaRepository.findByVariavel(medidaMsg.getMedida());
 			}
 			
-			System.out.println(String.format("%s: %s=%s %s", medida.getNome(), medida.getVariavel(), medidaMsg.getValor(), medidaMsg.getUnidade()));
-			
 			if (medida != null) {
-				variaveis.put(medida.getVariavel(), medidaMsg.getValor());
+				BigDecimal valor = converteUnidade(medidaMsg.getUnidade(), medida.getUnidade(), medidaMsg.getValor());
+				System.out.println(String.format("%s: %s=%s %s", medida.getNome(), medida.getVariavel(), valor, medida.getUnidade()));
+				variaveis.put(medida.getVariavel(), valor);
+			} else {
+				System.out.println(String.format("MEDIDA/VARIAVEL NAO ENCONTRADA: %s=[%.4f %s]", medidaMsg.getMedida(), medidaMsg.getValor().doubleValue(), medidaMsg.getUnidade()));			
 			}
 		}
 
-		Stack<MaterialMedida> unsolved = new Stack<MaterialMedida>();
+		Queue<MaterialMedida> unsolved = new LinkedList<MaterialMedida>();
 		
 		for (MaterialMedida materialMedida : material.getMedidas()) {
 			Expression exp = new Expression(materialMedida.getFormula());
@@ -137,8 +180,7 @@ public class MaterialController {
 			try {
 				valor = exp.setPrecision(20).eval();
 			} catch(Exception e) {
-				System.out.println(String.format("VALOR NAO RESOLVIDO: %s {%s}\n [%s]", materialMedida.getId().getMedida().getNome(), materialMedida.getFormula(), e.getMessage()));
-				unsolved.push(materialMedida);
+				unsolved.add(materialMedida);
 			}
 			
 			if (valor != null) {
@@ -148,8 +190,10 @@ public class MaterialController {
 			
 		}
 		
-		while (!unsolved.empty()) {
-			MaterialMedida materialMedida = unsolved.pop();
+		int unsolvedCount = (int)Math.pow((double)unsolved.size(), 2);
+		
+		while (!unsolved.isEmpty() && unsolvedCount > 0) {
+			MaterialMedida materialMedida = unsolved.remove();
 			
 			Expression exp = new Expression(materialMedida.getFormula());
 			
@@ -160,8 +204,8 @@ public class MaterialController {
 			try {
 				valor = exp.setPrecision(20).eval();
 			} catch(Exception e) {
-				System.out.println(String.format("VALOR NAO RESOLVIDO: %s {%s}\n [%s]", materialMedida.getId().getMedida().getNome(), materialMedida.getFormula(), e.getMessage()));
 				unsolved.add(materialMedida);
+				unsolvedCount--;
 			}
 			
 			if (valor != null) {
@@ -170,11 +214,16 @@ public class MaterialController {
 			}
 		}
 		
+		while (!unsolved.isEmpty()) {
+			MaterialMedida materialMedida = unsolved.remove();
+			System.out.println(String.format("VALOR NAO RESOLVIDO: %s={%s}", materialMedida.getId().getMedida().getNome(), materialMedida.getFormula()));			
+		}
+		
 		System.out.println(String.format("\n----------------------------------------------------------------------------------------\n%s %s\n----------------------------------------------------------------------------------------\nVARIAVEIS\n----------------------------------------------------------------------------------------", material.getCodigo(),
 				replaceVariables(variaveis, material.getDescricao())));
 		
 		for (Map.Entry<String, BigDecimal> v : variaveis.entrySet()) {
-			System.out.println(String.format("%s=%.4f", 
+			System.out.println(String.format("%s=%.10f", 
 					v.getKey(), v.getValue()));
 		}
 		
@@ -186,7 +235,7 @@ public class MaterialController {
 			
 			exp.setVariables(variaveis);
 			
-			System.out.println(String.format("%s [%.3f %s]", materialMedida.getId().getMedida().getNome(), materialMedida.getValor() == null ? 0f : materialMedida.getValor().doubleValue(), materialMedida.getUnidade()));
+			System.out.println(String.format("%s [%.10f %s]", materialMedida.getId().getMedida().getNome(), materialMedida.getValor() == null ? 0f : materialMedida.getValor().doubleValue(), materialMedida.getUnidade()));
 		}
 
 		/*materialComponente.getId().getComponente().getVariavel().putAll(variaveis);
