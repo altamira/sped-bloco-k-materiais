@@ -8,11 +8,11 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "MATERIAL_LOTE_MEDIDA")
-public class MaterialLoteMedida {
+@Table(name = "MATERIAL_INVENTARIO_MEDIDA")
+public class MaterialInventarioMedida {
 	
 	@EmbeddedId
-	private MaterialLoteMedidaPK id;
+	private MaterialInventarioMedidaPK id;
 	
 	@Column(name = "UNIDADE")
 	private String unidade;
@@ -20,11 +20,11 @@ public class MaterialLoteMedida {
 	@Column(name = "VALOR")
 	private BigDecimal valor;
 
-	public MaterialLoteMedida() {
+	public MaterialInventarioMedida() {
 		super();
 	}
 
-	public MaterialLoteMedida(MaterialLoteMedidaPK id, String unidade,
+	public MaterialInventarioMedida(MaterialInventarioMedidaPK id, String unidade,
 			BigDecimal valor) {
 		super();
 		this.id = id;
@@ -32,11 +32,11 @@ public class MaterialLoteMedida {
 		this.valor = valor;
 	}
 
-	public MaterialLoteMedidaPK getId() {
+	public MaterialInventarioMedidaPK getId() {
 		return id;
 	}
 
-	public void setId(MaterialLoteMedidaPK id) {
+	public void setId(MaterialInventarioMedidaPK id) {
 		this.id = id;
 	}
 
@@ -65,10 +65,10 @@ public class MaterialLoteMedida {
 			return 
 				this.id.getMedida().equals(castOther.getNome());			
 		}
-		if (!(other instanceof MaterialLoteMedida)) {
+		if (!(other instanceof MaterialInventarioMedida)) {
 			return false;
 		}
-		MaterialLoteMedida castOther = (MaterialLoteMedida)other;
+		MaterialInventarioMedida castOther = (MaterialInventarioMedida)other;
 		return 
 			this.id.getMedida().equals(castOther.getId().getMedida());
 	}

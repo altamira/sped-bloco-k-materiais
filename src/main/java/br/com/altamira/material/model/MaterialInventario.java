@@ -12,11 +12,11 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "MATERIAL_LOTE")
-public class MaterialLote {
+@Table(name = "MATERIAL_INVENTARIO")
+public class MaterialInventario {
 
 	@EmbeddedId
-	private MaterialLotePK id;
+	private MaterialInventarioPK id;
 	
 	@Column(name = "MATERIAL")
 	private String material;
@@ -26,27 +26,27 @@ public class MaterialLote {
 	       @JoinColumn(name = "tipo", referencedColumnName = "TIPO"),
 	       @JoinColumn(name = "numero", referencedColumnName = "NUMERO")
 	    })
-	private Set<MaterialLoteMedida> medidas;
+	private Set<MaterialInventarioMedida> medidas;
 		
 	@Column(name = "LOCAL")
 	private String local;	
 	
-	public MaterialLote() {
+	public MaterialInventario() {
 		super();
 	}
 
-	public MaterialLote(MaterialLotePK id, String material, String local) {
+	public MaterialInventario(MaterialInventarioPK id, String material, String local) {
 		super();
 		this.id = id;
 		this.material = material;
 		this.local = local;
 	}
 
-	public MaterialLotePK getId() {
+	public MaterialInventarioPK getId() {
 		return id;
 	}
 
-	public void setId(MaterialLotePK id) {
+	public void setId(MaterialInventarioPK id) {
 		this.id = id;
 	}
 
@@ -58,11 +58,11 @@ public class MaterialLote {
 		this.material = material;
 	}
 
-	public Set<MaterialLoteMedida> getMedidas() {
+	public Set<MaterialInventarioMedida> getMedidas() {
 		return medidas;
 	}
 
-	public void setMedidas(Set<MaterialLoteMedida> medidas) {
+	public void setMedidas(Set<MaterialInventarioMedida> medidas) {
 		this.medidas = medidas;
 	}
 

@@ -46,7 +46,7 @@ public class MaterialMedidaPK implements Serializable {
 		if (this == other) {
 			return true;
 		}
-		if (!(other instanceof MaterialLotePK)) {
+		if (!(other instanceof MaterialInventarioPK)) {
 			return false;
 		}
 		MaterialMedidaPK castOther = (MaterialMedidaPK)other;

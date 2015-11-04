@@ -2,14 +2,15 @@ package br.com.altamira.material.model;
 
 import java.io.Serializable;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Embeddable;
 
 /**
  * The primary key class for the OrcMat database table.
  * 
  */
 @Embeddable
-public class MaterialLotePK implements Serializable {
+public class MaterialInventarioMedidaPK implements Serializable {
 	//default serial version id, required for serializable classes.
 	private static final long serialVersionUID = 1L;
 
@@ -18,14 +19,21 @@ public class MaterialLotePK implements Serializable {
 
 	@Column(name="NUMERO")
 	private long numero;
-
-	public MaterialLotePK() {
-	}
 	
-	public MaterialLotePK(String tipo, long numero) {
+	/*@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "MEDIDA", nullable = false)*/
+	@Column(name = "MEDIDA")
+	private String medida;
+
+	public MaterialInventarioMedidaPK() {
+		super();
+	}
+
+	public MaterialInventarioMedidaPK(String tipo, long numero, String medida) {
 		super();
 		this.tipo = tipo;
 		this.numero = numero;
+		this.medida = medida;
 	}
 
 	public String getTipo() {
@@ -44,14 +52,22 @@ public class MaterialLotePK implements Serializable {
 		this.numero = numero;
 	}
 
+	public String getMedida() {
+		return medida;
+	}
+
+	public void setMedida(String medida) {
+		this.medida = medida;
+	}
+
 	public boolean equals(Object other) {
 		if (this == other) {
 			return true;
 		}
-		if (!(other instanceof MaterialLotePK)) {
+		if (!(other instanceof MaterialInventarioPK)) {
 			return false;
 		}
-		MaterialLotePK castOther = (MaterialLotePK)other;
+		MaterialInventarioMedidaPK castOther = (MaterialInventarioMedidaPK)other;
 		return 
 			this.tipo.equals(castOther.tipo)
 			&& (this.numero == castOther.numero);

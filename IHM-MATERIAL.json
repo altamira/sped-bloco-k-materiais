@@ -106,12 +106,12 @@ SI
 
 
 
----------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------
 CASOS DE USO
----------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------
 
-1. ENTRADA NO ALMOXARIFADO POR RECEBIMENTO DE MATERIAL DE TERCEIROS
----------------------------------------------------------------------------
+1. ENTRADA NO ALMOXARIFADO POR RECEBIMENTO DE MATERIAL DE TERCEIROS (IHM-MATERIAL-MOVIMENTACAO)
+------------------------------------------------------------------------------------------------------
 {
 "maquina": "IHMALMTAMAINDE",
 "datahora": "2015-10-29T12:25:43-0200",
@@ -138,8 +138,36 @@ CASOS DE USO
   }]
 }
 
-1. RETIRA A BOBINA DO ALMOXARIFADO E COLOCA NA MÁQUINA COLUNA SIGMA
----------------------------------------------------------------------------
+2. SERVIDOR ENVIA DADOS DA NOVA BOBINA PARA IHM (IHM-MATERIAL-CADASTRO)
+------------------------------------------------------------------------------------------------------
+{
+"maquina": "IHMALMTAMAINDE",
+"datahora": "2015-10-29T12:25:43-0200",
+"materiais": 
+  [{ 
+    "lote": 
+      { 
+        "tipo": "01", 
+	"numero": 415
+      }, 
+    "codigo": "ALPRFQ30-KG20000F240", 
+    "descricao": "AÇO LAM PLANO FINA QUENTE PRETO ROLO 30KG/MM2 2,00MM ESP FITA 240MM", 
+    "emUso": true,
+    "local":"TAMAINDE-ALMOXARIFADO-E1",
+    "medidas": 
+      [
+        { "medida": "largura", "unidade": "mm", "valor": 240},
+        { "medida": "espessura", "unidade": "mm", "valor": 2.000000},
+        { "medida": "quantidade", "unidade": "pc", "valor": 1},
+        { "medida": "densidade", "unidade": "kg/mm^3", "valor": 0.0000078560},
+        { "medida": "comprimento", "unidade": "mm", "valor": 667181.4006000000},
+        { "medida": "peso", "unidade": "kg", "valor": 2515.861}
+      ]
+  }]
+}
+
+3. RETIRA A BOBINA DO ALMOXARIFADO E COLOCA NA MÁQUINA COLUNA SIGMA (IHM-MATERIAL-MOVIMENTACAO)
+------------------------------------------------------------------------------------------------------
 {
 "maquina": "IHMSIGMA",
 "datahora": "2015-10-29T14:13:56-0200",
@@ -186,8 +214,8 @@ CASOS DE USO
 }
 
 
-2. PRODUZIU 1 pc DE PERFIL LONG SG120 CH14 F240 2300MM, QUANT. OP 125 PCS
----------------------------------------------------------------------------
+4. PRODUZIU 1 pc DE PERFIL LONG SG120 CH14 F240 2300MM, QUANT. OP 125 PCS (IHM-MATERIAL-MOVIMENTACAO)
+------------------------------------------------------------------------------------------------------
 {
 "maquina": "IHMSIGMA",
 "datahora": "2015-10-29T12:25:43-0400",
@@ -227,7 +255,7 @@ CASOS DE USO
         { "medida": "espessura", "unidade": "mm", "valor": 2.000000},
         { "medida": "quantidade", "unidade": "pc", "valor": 1},
         { "medida": "comprimento", "unidade": "mm", "valor": 2293.000},
-        { "medida": "peso", "unidade": "kg", "valor": 8.673024}
+        { "medida": "peso", "unidade": "kg", "valor": 8.64662784}
       ]
   },
   { 
@@ -244,7 +272,7 @@ CASOS DE USO
     "medidas": 
       [
         { "medida": "comprimento", "unidade": "mm", "valor": 2301.000},
-        { "medida": "peso", "unidade": "kg", "valor": 8.70319104},
+        { "medida": "peso", "unidade": "kg", "valor": 8.67679488}
       ]
   },
   { 
@@ -260,11 +288,8 @@ CASOS DE USO
     "local":"TAMAINDE-COLUNA-SIGMA-E1",
     "medidas": 
       [
-        { "medida": "largura", "unidade": "mm", "valor": 240},
-        { "medida": "espessura", "unidade": "mm", "valor": 2.000000},
-        { "medida": "quantidade", "unidade": "pc", "valor": 1},
         { "medida": "comprimento", "unidade": "mm", "valor": 8.000},
-        { "medida": "peso", "unidade": "kg", "valor": 0,03016704}
+        { "medida": "peso", "unidade": "kg", "valor": 0.03016704}
       ]
   }]
 }

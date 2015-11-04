@@ -52,7 +52,7 @@ public class MaterialComponentePK implements Serializable {
 		if (this == other) {
 			return true;
 		}
-		if (!(other instanceof MaterialLotePK)) {
+		if (!(other instanceof MaterialInventarioPK)) {
 			return false;
 		}
 		MaterialComponentePK castOther = (MaterialComponentePK)other;

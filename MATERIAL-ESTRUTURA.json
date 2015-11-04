@@ -1,0 +1,9 @@
+{ 
+    "codigo": "PPLSIG14080170000000", 
+    "descricao": "LONGARINA SG 80 CH14 F170 MED.#c#MM", 
+    "medidas": 
+      [
+        { "medida": "comprimento", "unidade": "mm", "valor": 2300.0000},
+        { "medida": "quantidade", "unidade": "pc", "valor": 1500}
+      ]
+  }

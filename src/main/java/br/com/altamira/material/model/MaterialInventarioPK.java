@@ -9,7 +9,7 @@ import javax.persistence.*;
  * 
  */
 @Embeddable
-public class MaterialLoteMedidaPK implements Serializable {
+public class MaterialInventarioPK implements Serializable {
 	//default serial version id, required for serializable classes.
 	private static final long serialVersionUID = 1L;
 
@@ -18,21 +18,14 @@ public class MaterialLoteMedidaPK implements Serializable {
 
 	@Column(name="NUMERO")
 	private long numero;
-	
-	/*@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "MEDIDA", nullable = false)*/
-	@Column(name = "MEDIDA")
-	private String medida;
 
-	public MaterialLoteMedidaPK() {
-		super();
+	public MaterialInventarioPK() {
 	}
-
-	public MaterialLoteMedidaPK(String tipo, long numero, String medida) {
+	
+	public MaterialInventarioPK(String tipo, long numero) {
 		super();
 		this.tipo = tipo;
 		this.numero = numero;
-		this.medida = medida;
 	}
 
 	public String getTipo() {
@@ -51,22 +44,14 @@ public class MaterialLoteMedidaPK implements Serializable {
 		this.numero = numero;
 	}
 
-	public String getMedida() {
-		return medida;
-	}
-
-	public void setMedida(String medida) {
-		this.medida = medida;
-	}
-
 	public boolean equals(Object other) {
 		if (this == other) {
 			return true;
 		}
-		if (!(other instanceof MaterialLotePK)) {
+		if (!(other instanceof MaterialInventarioPK)) {
 			return false;
 		}
-		MaterialLoteMedidaPK castOther = (MaterialLoteMedidaPK)other;
+		MaterialInventarioPK castOther = (MaterialInventarioPK)other;
 		return 
 			this.tipo.equals(castOther.tipo)
 			&& (this.numero == castOther.numero);

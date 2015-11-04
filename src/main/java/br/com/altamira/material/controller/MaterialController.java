@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
-import java.util.Stack;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.annotation.JmsListener;
@@ -20,10 +19,10 @@ import br.com.altamira.material.model.ConversaoUnidade;
 import br.com.altamira.material.model.ConversaoUnidadePK;
 import br.com.altamira.material.model.Material;
 import br.com.altamira.material.model.MaterialComponente;
-import br.com.altamira.material.model.MaterialLote;
-import br.com.altamira.material.model.MaterialLoteMedida;
-import br.com.altamira.material.model.MaterialLoteMedidaPK;
-import br.com.altamira.material.model.MaterialLotePK;
+import br.com.altamira.material.model.MaterialInventario;
+import br.com.altamira.material.model.MaterialInventarioMedida;
+import br.com.altamira.material.model.MaterialInventarioMedidaPK;
+import br.com.altamira.material.model.MaterialInventarioPK;
 import br.com.altamira.material.model.MaterialMedida;
 import br.com.altamira.material.model.MaterialMovimento;
 import br.com.altamira.material.model.MaterialMovimentoItem;
@@ -36,8 +35,8 @@ import br.com.altamira.material.msg.MedidaMsg;
 import br.com.altamira.material.msg.MovimentoMsg;
 import br.com.altamira.material.repository.ConversaoUnidadeRepository;
 import br.com.altamira.material.repository.MaterialComponenteRepository;
-import br.com.altamira.material.repository.MaterialLoteMedidaRepository;
-import br.com.altamira.material.repository.MaterialLoteRepository;
+import br.com.altamira.material.repository.MaterialInventarioMedidaRepository;
+import br.com.altamira.material.repository.MaterialInventarioRepository;
 import br.com.altamira.material.repository.MaterialMedidaRepository;
 import br.com.altamira.material.repository.MaterialMovimentoItemMedidaRepository;
 import br.com.altamira.material.repository.MaterialMovimentoItemRepository;
@@ -70,13 +69,13 @@ public class MaterialController {
 	private MaterialMovimentoRepository materialMovimentoRepository;
 	
 	@Autowired
-	private MaterialLoteRepository materialLoteRepository;
+	private MaterialInventarioRepository materialInventarioRepository;
 	
 	@Autowired
 	private MaterialMovimentoItemRepository materialMovimentoItemRepository;
 	
 	@Autowired
-	private MaterialLoteMedidaRepository materialLoteMedidaRepository;
+	private MaterialInventarioMedidaRepository materialInventarioMedidaRepository;
 	
 	@Autowired
 	private MaterialMovimentoItemMedidaRepository materialMovimentoItemMedidaRepository;
@@ -95,7 +94,7 @@ public class MaterialController {
 	 * @param prdorc
 	 */
 	@Transactional
-	@JmsListener(destination = "IMPORT-MATERIAL")
+	@JmsListener(destination = "MATERIAL-IMPORTAR")
 	public void importaMaterial(Prdorc prdorc) {
 		System.out.println("Recebido " + prdorc.getProduto());
 
@@ -178,7 +177,7 @@ public class MaterialController {
 			BigDecimal valor = null;
 			
 			try {
-				valor = exp.setPrecision(20).eval();
+				valor = exp.setPrecision(10).eval();
 			} catch(Exception e) {
 				unsolved.add(materialMedida);
 			}
@@ -190,6 +189,7 @@ public class MaterialController {
 			
 		}
 		
+		// calcula o numero máximo de iteracoes até resolver todas as dependencias entre as variaveis
 		int unsolvedCount = (int)Math.pow((double)unsolved.size(), 2);
 		
 		while (!unsolved.isEmpty() && unsolvedCount > 0) {
@@ -202,7 +202,7 @@ public class MaterialController {
 			BigDecimal valor = null;
 			
 			try {
-				valor = exp.setPrecision(20).eval();
+				valor = exp.setPrecision(10).eval();
 			} catch(Exception e) {
 				unsolved.add(materialMedida);
 				unsolvedCount--;
@@ -219,15 +219,15 @@ public class MaterialController {
 			System.out.println(String.format("VALOR NAO RESOLVIDO: %s={%s}", materialMedida.getId().getMedida().getNome(), materialMedida.getFormula()));			
 		}
 		
-		System.out.println(String.format("\n----------------------------------------------------------------------------------------\n%s %s\n----------------------------------------------------------------------------------------\nVARIAVEIS\n----------------------------------------------------------------------------------------", material.getCodigo(),
-				replaceVariables(variaveis, material.getDescricao())));
+		System.out.println(String.format("\n---------------------------------------------------------------------------------------------------\n| %1$15s %2$74s |\n---------------------------------------------------------------------------------------------------\n| %3$95s |\n---------------------------------------------------------------------------------------------------", material.getCodigo(),
+				replaceVariables(variaveis, material.getDescricao()), "VARIAVEIS"));
 		
 		for (Map.Entry<String, BigDecimal> v : variaveis.entrySet()) {
-			System.out.println(String.format("%s=%.10f", 
-					v.getKey(), v.getValue()));
+			System.out.println(String.format("| %1$95s |", String.format("%1$20s = %2$25.10f", 
+					v.getKey(), v.getValue())));
 		}
 		
-		System.out.println(String.format("\n----------------------------------------------------------------------------------------\nMEDIDAS\n----------------------------------------------------------------------------------------"));
+		System.out.println(String.format("---------------------------------------------------------------------------------------------------\n| %1$95s |\n---------------------------------------------------------------------------------------------------", "MEDIDAS"));
 
 		for (MaterialMedida materialMedida : material.getMedidas()) {
 			
@@ -235,63 +235,48 @@ public class MaterialController {
 			
 			exp.setVariables(variaveis);
 			
-			System.out.println(String.format("%s [%.10f %s]", materialMedida.getId().getMedida().getNome(), materialMedida.getValor() == null ? 0f : materialMedida.getValor().doubleValue(), materialMedida.getUnidade()));
+			System.out.println(String.format("| %1$95s |", String.format("%1$20s [%2$25.10f %3$10s]", materialMedida.getId().getMedida().getNome(), materialMedida.getValor() == null ? 0f : materialMedida.getValor().doubleValue(), materialMedida.getUnidade())));
 		}
 
-		/*materialComponente.getId().getComponente().getVariavel().putAll(variaveis);
-		
-		Expression exp = new Expression(materialComponente.getConsumoExpressao());
-		
-		exp.setVariables(materialComponente.getId().getComponente().getVariavel());
-		
-		materialComponente.getId().getComponente().getVariavel()
-				.put(materialComponente.getConsumoMedida().getNome(), exp.eval());
-		
-		System.out.println(String.format(
-				"%s %s %s [%.3f %s]",
-				tab,
-				materialComponente.getId().getComponente().getCodigo(),
-				replaceVariables(variaveis, materialComponente.getId().getComponente()
-						.getDescricao()),
-						materialComponente.getId().getComponente().getVariavel()
-						.get(materialComponente.getConsumoMedida().getNome()),
-						materialComponente.getConsumoMedida().getUnidade()));
-		
-		for (Map.Entry<String, BigDecimal> v : materialComponente.getId().getComponente()
-				.getVariavel().entrySet()) {
-			System.out.println(String.format("%s [%s=%.4f]", tab + " =>",
-					v.getKey(), v.getValue()));
-		}*/
+		System.out.println(String.format("---------------------------------------------------------------------------------------------------\n"));
 		
 	}
 	
 	/**
 	 * Calcula as variáveis das medidas dos materiais
 	 * @param parameters
-	 * @throws JsonParseException
-	 * @throws JsonMappingException
-	 * @throws IOException
+	 * @throws Exception 
 	 */
-	@JmsListener(destination = "MATERIAL-LIST")
-	public void calculaEstruturaMaterial(String parameters)
-			throws JsonParseException, JsonMappingException, IOException {
-		ObjectMapper o = new ObjectMapper();
-
-		@SuppressWarnings("unchecked")
-		Map<String, Object> param = o.readValue(parameters, Map.class);
-
-		Material material = materialRepository.findOne(param.get("codigo")
-				.toString());
+	@JmsListener(destination = "MATERIAL-ESTRUTURA")
+	public void calculaEstruturaMaterial(String msg)
+			throws Exception {
+		ObjectMapper mapper = new ObjectMapper();
+		MaterialMsg materialMsg = mapper.readValue(msg, MaterialMsg.class);
+		
+		Material material = materialRepository.findOne(materialMsg.getCodigo());
 
 		if (material == null) {
-			System.out.println("Codigo nao entrado: " + param.get("codigo"));
+			System.out.println("Codigo nao entrado: " + materialMsg.getCodigo());
 			return;
 		}
 
 		Map<String, BigDecimal> variaveis = new HashMap<String, BigDecimal>();
 
-		variaveis.put("c", new BigDecimal(param.get("c").toString()));
-		variaveis.put("q", new BigDecimal(param.get("q").toString()));
+		for (MedidaMsg medidaMsg : materialMsg.getMedidas()) {
+			Medida medida = medidaRepository.findByNome(medidaMsg.getMedida());
+			
+			if (medida == null) {
+				medida = medidaRepository.findByVariavel(medidaMsg.getMedida());
+			}
+			
+			if (medida != null) {
+				BigDecimal valor = converteUnidade(medidaMsg.getUnidade(), medida.getUnidade(), medidaMsg.getValor());
+				System.out.println(String.format("%s: %s=%s %s", medida.getNome(), medida.getVariavel(), valor, medida.getUnidade()));
+				variaveis.put(medida.getVariavel(), valor);
+			} else {
+				System.out.println(String.format("MEDIDA/VARIAVEL NAO ENCONTRADA: %s=[%.4f %s]", medidaMsg.getMedida(), medidaMsg.getValor().doubleValue(), medidaMsg.getUnidade()));			
+			}
+		}
 
 		System.out.println(String.format("%s %s", material.getCodigo(),
 				replaceVariables(variaveis, material.getDescricao())));
@@ -307,8 +292,112 @@ public class MaterialController {
 	 */
 	private void imprimeEstruturaMaterial(Map<String, BigDecimal> variaveis,
 			Material material, String tab) {
+		
+		Queue<MaterialMedida> unsolved = new LinkedList<MaterialMedida>();
+		
+		for (MaterialMedida materialMedida : material.getMedidas()) {
+			Expression exp = new Expression(materialMedida.getFormula());
+			
+			exp.setVariables(variaveis);
+			
+			BigDecimal valor = null;
+			
+			try {
+				valor = exp.setPrecision(10).eval();
+			} catch(Exception e) {
+				unsolved.add(materialMedida);
+			}
+			
+			if (valor != null) {
+				materialMedida.setValor(valor);
+				variaveis.put(materialMedida.getId().getMedida().getNome(), materialMedida.getValor());
+			}
+			
+		}
+		
+		// calcula o numero máximo de iteracoes até resolver todas as dependencias entre as variaveis
+		int unsolvedCount = (int)Math.pow((double)unsolved.size(), 2);
+		
+		while (!unsolved.isEmpty() && unsolvedCount > 0) {
+			MaterialMedida materialMedida = unsolved.remove();
+			
+			Expression exp = new Expression(materialMedida.getFormula());
+			
+			exp.setVariables(variaveis);
+			
+			BigDecimal valor = null;
+			
+			try {
+				valor = exp.setPrecision(10).eval();
+			} catch(Exception e) {
+				unsolved.add(materialMedida);
+				unsolvedCount--;
+			}
+			
+			if (valor != null) {
+				materialMedida.setValor(valor);
+				variaveis.put(materialMedida.getId().getMedida().getNome(), materialMedida.getValor());
+			}
+		}
+		
+		while (!unsolved.isEmpty()) {
+			MaterialMedida materialMedida = unsolved.remove();
+			System.out.println(String.format("VALOR NAO RESOLVIDO: %s={%s}", materialMedida.getId().getMedida().getNome(), materialMedida.getFormula()));			
+		}
 
 		for (MaterialComponente materialComponente : material.getComponentes()) {
+
+			unsolved = new LinkedList<MaterialMedida>();
+			
+			for (MaterialMedida materialMedida : materialComponente.getId().getComponente().getMedidas()) {
+				Expression exp = new Expression(materialMedida.getFormula());
+				
+				exp.setVariables(variaveis);
+				
+				BigDecimal valor = null;
+				
+				try {
+					valor = exp.setPrecision(10).eval();
+				} catch(Exception e) {
+					unsolved.add(materialMedida);
+				}
+				
+				if (valor != null) {
+					materialMedida.setValor(valor);
+					variaveis.put(materialMedida.getId().getMedida().getNome(), materialMedida.getValor());
+				}
+				
+			}
+			
+			// calcula o numero máximo de iteracoes até resolver todas as dependencias entre as variaveis
+			unsolvedCount = (int)Math.pow((double)unsolved.size(), 2);
+			
+			while (!unsolved.isEmpty() && unsolvedCount > 0) {
+				MaterialMedida materialMedida = unsolved.remove();
+				
+				Expression exp = new Expression(materialMedida.getFormula());
+				
+				exp.setVariables(variaveis);
+				
+				BigDecimal valor = null;
+				
+				try {
+					valor = exp.setPrecision(10).eval();
+				} catch(Exception e) {
+					unsolved.add(materialMedida);
+					unsolvedCount--;
+				}
+				
+				if (valor != null) {
+					materialMedida.setValor(valor);
+					variaveis.put(materialMedida.getId().getMedida().getNome(), materialMedida.getValor());
+				}
+			}
+			
+			while (!unsolved.isEmpty()) {
+				MaterialMedida materialMedida = unsolved.remove();
+				System.out.println(String.format("VALOR NAO RESOLVIDO: %s={%s}", materialMedida.getId().getMedida().getNome(), materialMedida.getFormula()));			
+			}
 			
 			materialComponente.getId().getComponente().getVariavel().putAll(variaveis);
 			
@@ -317,10 +406,10 @@ public class MaterialController {
 			exp.setVariables(materialComponente.getId().getComponente().getVariavel());
 			
 			materialComponente.getId().getComponente().getVariavel()
-					.put(materialComponente.getConsumoMedida().getNome(), exp.eval());
+					.put(materialComponente.getConsumoMedida().getNome(), exp.setPrecision(10).eval());
 			
 			System.out.println(String.format(
-					"%s %s %s [%.3f %s]",
+					"%s %s %s [%.10f %s]",
 					tab,
 					materialComponente.getId().getComponente().getCodigo(),
 					replaceVariables(variaveis, materialComponente.getId().getComponente()
@@ -331,7 +420,7 @@ public class MaterialController {
 			
 			for (Map.Entry<String, BigDecimal> v : materialComponente.getId().getComponente()
 					.getVariavel().entrySet()) {
-				System.out.println(String.format("%s [%s=%.4f]", tab + " =>",
+				System.out.println(String.format("%s [%s=%.10f]", tab + " =>",
 						v.getKey(), v.getValue()));
 			}
 			
@@ -366,11 +455,11 @@ public class MaterialController {
 	 * @throws ParseException
 	 */
 	@Transactional
-	@JmsListener(destination = "IHM-MATERIAL")
+	@JmsListener(destination = "IHM-MATERIAL-MOVIMENTACAO")
 	public void materialMovimento(String msg) throws JsonParseException,
 			JsonMappingException, IOException, ParseException {
 		System.out.println(String.format(
-				"\n--------------------------------------------------------------------------------\nCHEGOU MENSAGEM DE IHM-MATERIAL-MOVIMENTO\n--------------------------------------------------------------------------------\n%s\n--------------------------------------------------------------------------------\n", msg));
+				"\n--------------------------------------------------------------------------------\nCHEGOU MENSAGEM DE IHM-MATERIAL-MOVIMENTACAO\n--------------------------------------------------------------------------------\n%s\n--------------------------------------------------------------------------------\n", msg));
 
 		ObjectMapper mapper = new ObjectMapper();
 		MovimentoMsg movimentoMsg = mapper.readValue(msg, MovimentoMsg.class);
@@ -393,7 +482,7 @@ public class MaterialController {
 
 					materialMovimentoItemRepository.saveAndFlush(item);
 					
-					MaterialLote lote = materialLoteRepository.findOne(new MaterialLotePK(materialMsg.getLote().getTipo(), materialMsg.getLote().getNumero()));
+					MaterialInventario lote = materialInventarioRepository.findOne(new MaterialInventarioPK(materialMsg.getLote().getTipo(), materialMsg.getLote().getNumero()));
 					
 					if (lote != null) {
 						
@@ -404,14 +493,14 @@ public class MaterialController {
 					} else {
 						
 						if (movimentoTipo.getGerarLote()) {
-							lote = new MaterialLote(new MaterialLotePK(materialMsg.getLote().getTipo(), materialMsg.getLote().getNumero()), material.getCodigo(), materialMsg.getLocal());
+							lote = new MaterialInventario(new MaterialInventarioPK(materialMsg.getLote().getTipo(), materialMsg.getLote().getNumero()), material.getCodigo(), materialMsg.getLocal());
 						} else {
 							System.out.println(String.format(
 								"\n****************************************************************************\n -----> NAO ENCONTROU/GEROU LOTE: %s-%s\n****************************************************************************\n", materialMsg.getLote().getTipo(), materialMsg.getLote().getNumero().toString()));
 						}
 					}
 
-					materialLoteRepository.saveAndFlush(lote);
+					materialInventarioRepository.saveAndFlush(lote);
 
 					Map<String, BigDecimal> variaveis;
 					
@@ -446,11 +535,11 @@ public class MaterialController {
 							
 
 							
-							MaterialLoteMedida loteMedida = materialLoteMedidaRepository.findOne(new MaterialLoteMedidaPK(materialMsg.getLote().getTipo(), materialMsg.getLote().getNumero(), medida.getNome()));
+							MaterialInventarioMedida loteMedida = materialInventarioMedidaRepository.findOne(new MaterialInventarioMedidaPK(materialMsg.getLote().getTipo(), materialMsg.getLote().getNumero(), medida.getNome()));
 
 							if (loteMedida == null) {
 								
-								loteMedida = new MaterialLoteMedida(new MaterialLoteMedidaPK(materialMsg.getLote().getTipo(), materialMsg.getLote().getNumero(), medida.getNome()), medidaMsg.getUnidade(), medidaMsg.getValor());
+								loteMedida = new MaterialInventarioMedida(new MaterialInventarioMedidaPK(materialMsg.getLote().getTipo(), materialMsg.getLote().getNumero(), medida.getNome()), medidaMsg.getUnidade(), medidaMsg.getValor());
 							
 							} else {
 								
@@ -465,7 +554,7 @@ public class MaterialController {
 								}									
 							}
 							
-							materialLoteMedidaRepository.saveAndFlush(loteMedida);
+							materialInventarioMedidaRepository.saveAndFlush(loteMedida);
 
 							MaterialMovimentoItemMedida itemMedida = new MaterialMovimentoItemMedida(item.getId(), medida, medidaMsg.getUnidade(), medidaMsg.getValor());
 							
