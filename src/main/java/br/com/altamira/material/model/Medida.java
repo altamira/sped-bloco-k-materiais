@@ -22,6 +22,15 @@ public class Medida {
 	@Column(name = "VARIAVEL")
 	private String variavel;
 
+	public Medida() {
+		super();
+	}
+
+	public Medida(String nome) {
+		super();
+		this.nome = nome;
+	}
+
 	public String getNome() {
 		return nome;
 	}

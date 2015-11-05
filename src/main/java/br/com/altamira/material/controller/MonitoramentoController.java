@@ -2,6 +2,7 @@ package br.com.altamira.material.controller;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.HashSet;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -10,9 +11,15 @@ import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 
 import br.com.altamira.material.model.MaquinaLog;
+import br.com.altamira.material.model.MaquinaLogParametro;
+import br.com.altamira.material.model.MaquinaLogParametroPK;
+import br.com.altamira.material.model.Medida;
+import br.com.altamira.material.msg.MedidaMsg;
 import br.com.altamira.material.msg.MonitoramentoMsg;
+import br.com.altamira.material.repository.MaquinaLogParametroRepository;
 import br.com.altamira.material.repository.MaquinaLogRepository;
 import br.com.altamira.material.repository.MaquinaRepository;
+import br.com.altamira.material.repository.MedidaRepository;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -26,6 +33,12 @@ public class MonitoramentoController {
 	
 	@Autowired
 	private MaquinaLogRepository maquinaLogRepository;
+	
+	@Autowired
+	private MaquinaLogParametroRepository maquinaLogParametroRepository;
+
+	@Autowired
+	private MedidaRepository medidaRepository;
 	
 	@Autowired
 	@Qualifier("WebSocketHandler") 
@@ -49,6 +62,17 @@ public class MonitoramentoController {
 				);
 		
 		maquinaLogRepository.saveAndFlush(log);
+		
+		log.setParametros(new HashSet<MaquinaLogParametro>());
+		
+		for (MedidaMsg medidaMsg : monitoramentoMsg.getParametros()) {
+			MaquinaLogParametro maquinaLogParametro = new MaquinaLogParametro(
+							log.getId(), 
+							medidaMsg.getMedida(), 
+							medidaMsg.getUnidade(), 
+							medidaMsg.getValor());
+			maquinaLogParametroRepository.save(maquinaLogParametro);
+		}
 		
 		String approximateFirstReceiveTimestamp = String.valueOf(new Date().getTime());
 		
