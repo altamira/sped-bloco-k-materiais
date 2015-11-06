@@ -12,8 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import br.com.altamira.material.model.MaquinaLog;
 import br.com.altamira.material.model.MaquinaLogParametro;
-import br.com.altamira.material.model.MaquinaLogParametroPK;
-import br.com.altamira.material.model.Medida;
 import br.com.altamira.material.msg.MedidaMsg;
 import br.com.altamira.material.msg.MonitoramentoMsg;
 import br.com.altamira.material.repository.MaquinaLogParametroRepository;
@@ -63,15 +61,19 @@ public class MonitoramentoController {
 		
 		maquinaLogRepository.saveAndFlush(log);
 		
+		System.out.println(String.format("LOG ID: %d", log.getId()));
+		
 		log.setParametros(new HashSet<MaquinaLogParametro>());
 		
-		for (MedidaMsg medidaMsg : monitoramentoMsg.getParametros()) {
-			MaquinaLogParametro maquinaLogParametro = new MaquinaLogParametro(
-							log.getId(), 
-							medidaMsg.getMedida(), 
-							medidaMsg.getUnidade(), 
-							medidaMsg.getValor());
-			maquinaLogParametroRepository.save(maquinaLogParametro);
+		if (monitoramentoMsg.getParametros() != null) {
+			for (MedidaMsg medidaMsg : monitoramentoMsg.getParametros()) {
+				MaquinaLogParametro maquinaLogParametro = new MaquinaLogParametro(
+								log.getId(), 
+								medidaMsg.getMedida(), 
+								medidaMsg.getUnidade(), 
+								medidaMsg.getValor());
+				maquinaLogParametroRepository.saveAndFlush(maquinaLogParametro);
+			}
 		}
 		
 		String approximateFirstReceiveTimestamp = String.valueOf(new Date().getTime());

@@ -35,6 +35,10 @@ public class MaterialMovimentoItemMedida {
 	@Column(name = "VALOR")
 	private BigDecimal valor;
 
+	public MaterialMovimentoItemMedida() {
+		super();
+	}
+
 	public MaterialMovimentoItemMedida(long item, Medida medida,
 			String unidade, BigDecimal valor) {
 		super();
