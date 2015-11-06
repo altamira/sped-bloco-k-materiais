@@ -17,6 +17,7 @@ import br.com.altamira.data.wbccad.model.Prdorc;
 import br.com.altamira.material.expression.Expression;
 import br.com.altamira.material.model.ConversaoUnidade;
 import br.com.altamira.material.model.ConversaoUnidadePK;
+import br.com.altamira.material.model.Lote;
 import br.com.altamira.material.model.Material;
 import br.com.altamira.material.model.MaterialComponente;
 import br.com.altamira.material.model.MaterialInventario;
@@ -89,6 +90,14 @@ public class MaterialController {
 	@Autowired
 	private UnidadeRepository unidadeRepository;
 
+	@JmsListener(destination = "MATERIAL-DV")
+	public void materialDV(String numero) {
+		int modulo10 = Lote.getModulo10(Integer.parseUnsignedInt(numero));
+		int modulo11 = Lote.getModulo11(Integer.parseUnsignedInt(numero));
+		
+		System.out.println(String.format("%s-%d%d, modulo 10: %d, modulo 11: %d", numero, modulo10, modulo11, modulo10, modulo11));
+	}
+	
 	/**
 	 * Importa lista de materiais
 	 * @param prdorc
