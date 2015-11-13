@@ -8,6 +8,8 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
 
+import javax.measure.unit.Unit;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Controller;
@@ -90,9 +92,25 @@ public class MaterialController {
 	@Autowired
 	private UnidadeRepository unidadeRepository;
 
+	@JmsListener(destination = "UNIT-CONVERTER")
+	public void unitConverter(String msg) {
+        String fromUnit = "kg/m^3";
+        String toUnit = "kg/mm^3";
+        
+        double valor = 7856d;
+        
+        System.out.println(String.format("\nUnit Measure from %s to %s %.10f\n\n", fromUnit, toUnit, convert(valor, "kg/m^3", "kg/mm^3")));	
+	}
+
+	private double convert(double value, String fromUnit, String toUnit) {
+        return Unit.valueOf(fromUnit)
+                .getConverterTo(Unit.valueOf(toUnit))
+                .convert(value);
+    }
+	
 	@JmsListener(destination = "MATERIAL-DV")
 	public void materialDV(String numero) {
-		int modulo10 = Lote.getModulo10(Integer.parseUnsignedInt(numero));
+		int modulo10 = Lote.getModulo10(numero);
 		int modulo11 = Lote.getModulo11(Integer.parseUnsignedInt(numero));
 		
 		System.out.println(String.format("%s-%d%d, modulo 10: %d, modulo 11: %d", numero, modulo10, modulo11, modulo10, modulo11));

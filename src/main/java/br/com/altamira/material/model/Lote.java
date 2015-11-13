@@ -34,17 +34,23 @@ public class Lote {
 	    return 11 - somaPonderada % 11;    
 	} 
 	
-	public static int getModulo10(Integer numero) {
-		int i = (numero.toString().length() % 2) + 1;
-		int s = 0;
-		
-		for (char c : numero.toString().toCharArray()) {  
-			int r = (c - '0') * i;
-			s += r > 9 ? (r - 9) : r;
-			i = i == 2 ? 1 : 2;
+	/**
+	 * Rotina para calculo do modulo 10 otimizada
+	 * Calcula qualquer string numerica ou não 
+	 * @param numero
+	 * @return
+	 */
+	public static int getModulo10(String numero) {
+		int mul = numero.length() % 2 + 1;
+		int soma = 0;
+
+		for (char num : numero.toCharArray()) {  
+			int fator = (num - '0') * mul;
+			soma += fator > 9 ? (fator - 9) : fator;
+			mul = mul == 2 ? 1 : 2;
 		}
 
-		return s == 10 ? 0 : 10 - (s % 10);
+		return soma == 10 ? 0 : 10 - (soma % 10);
 	}
 
 }
