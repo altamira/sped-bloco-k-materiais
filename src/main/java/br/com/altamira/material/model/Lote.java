@@ -22,16 +22,22 @@ public class Lote {
 		this.numero = numero;
 	}
 	
-	public static int getModulo11(Integer numero) {  
-	    int[] pesos = {4, 3, 2, 9, 8, 7, 6, 5};   
-	    String n = numero.toString();
-	    int somaPonderada = 0;   
+	public static int getModulo11(String numero) {  
+	    int soma = 0;   
 	    
-	    for (int i = 0; i < n.length(); i++){  
-	        somaPonderada += pesos[i % 8] * (Integer.parseInt(n.substring(i, i + 1)));  
+	    for (int i = numero.length() - 1; i >= 0; i--) {  
+	    	soma += (numero.charAt(i) - '0') * (((numero.length() - 1) - i) % 8 + 2);  
 	    }
 	    
-	    return 11 - somaPonderada % 11;    
+	    int digito = soma % 11; 
+	    
+	    if(digito > 1) {
+			digito = 11 - digito;
+		} else {
+			digito = 0;
+		}
+	    
+	    return digito;    
 	} 
 	
 	/**
@@ -41,16 +47,21 @@ public class Lote {
 	 * @return
 	 */
 	public static int getModulo10(String numero) {
-		int mul = numero.length() % 2 + 1;
 		int soma = 0;
-
-		for (char num : numero.toCharArray()) {  
-			int fator = (num - '0') * mul;
-			soma += fator > 9 ? (fator - 9) : fator;
-			mul = mul == 2 ? 1 : 2;
+		
+		if (numero.length() < 6) {
+			numero = numero.trim();
 		}
-
-		return soma == 10 ? 0 : 10 - (soma % 10);
+		for (int i = numero.length() - 1; i >= 0; i--) {  
+			int fator = (numero.charAt(i) - '0') * ((numero.length() - i) % 2 + 1);
+			do {
+				soma += fator % 10;
+				fator /= 10;
+			} while(fator > 0);
+		}
+		int digito = 10 - (soma % 10);
+		
+		return digito == 10 ? 0 : digito;
 	}
 
 }

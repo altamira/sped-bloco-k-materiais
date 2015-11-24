@@ -5,7 +5,7 @@ import java.util.List;
 
 public class MovimentoMsg {
 
-	private String maquina;
+	private String ihm;
 	
 	private Date datahora;
 	
@@ -15,12 +15,12 @@ public class MovimentoMsg {
 	
 	private List<MaterialMsg> materiais;
 
-	public String getMaquina() {
-		return maquina;
+	public String getIHM() {
+		return ihm;
 	}
 
-	public void setMaquina(String maquina) {
-		this.maquina = maquina;
+	public void setIHM(String ihm) {
+		this.ihm = ihm;
 	}
 
 	public Date getDatahora() {

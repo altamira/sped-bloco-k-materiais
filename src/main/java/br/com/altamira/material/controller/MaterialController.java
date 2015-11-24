@@ -108,12 +108,28 @@ public class MaterialController {
                 .convert(value);
     }
 	
-	@JmsListener(destination = "MATERIAL-DV")
-	public void materialDV(String numero) {
-		int modulo10 = Lote.getModulo10(numero);
-		int modulo11 = Lote.getModulo11(Integer.parseUnsignedInt(numero));
+	@JmsListener(destination = "MATERIAL-DV-TESTE")
+	public void materialDV(String numeros) {
+		System.out.println("\n\nIniciando teste dos digitos verificadores");
 		
-		System.out.println(String.format("%s-%d%d, modulo 10: %d, modulo 11: %d", numero, modulo10, modulo11, modulo10, modulo11));
+		String[] nums = numeros.trim().replace(" ", "").replace("\n", "").replace("\r", "").split(";"); 
+		
+		for (String num : nums) {
+			String numero = num.replace("-", "");
+			numero = numero.substring(0, numero.length() - 2);
+			int modulo10 = Lote.getModulo10(numero);
+			int modulo11 = Lote.getModulo11(numero);
+			
+			int mod10 = Integer.parseInt(num.substring(num.length() - 2, num.length() - 1));
+			int mod11 = Integer.parseInt(num.substring(num.length() - 1, num.length()));
+			
+			if (mod10 != modulo10 && mod11 != modulo11) {
+				System.out.println(String.format("\nDigito invalido: %s -> DV: %d.%d", num, modulo10, modulo11));	
+			}
+			
+		}
+		
+		System.out.println(String.format("\nFim do teste, %d numeros foram verificados\n", nums.length));
 	}
 	
 	/**
@@ -491,7 +507,7 @@ public class MaterialController {
 		ObjectMapper mapper = new ObjectMapper();
 		MovimentoMsg movimentoMsg = mapper.readValue(msg, MovimentoMsg.class);
 
-		MaterialMovimento movimento = new MaterialMovimento(movimentoMsg.getDatahora(), movimentoMsg.getMaquina().toUpperCase(), movimentoMsg.getOperador());
+		MaterialMovimento movimento = new MaterialMovimento(movimentoMsg.getDatahora(), movimentoMsg.getIHM().toUpperCase(), movimentoMsg.getOperador());
 
 		materialMovimentoRepository.saveAndFlush(movimento);
 		

@@ -1,9 +1,13 @@
 package br.com.altamira.material.model;
 
+import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 @Entity
 @Table(name = "MAQUINA")
@@ -19,11 +23,28 @@ public class Maquina {
 	@Column(name = "SETOR")
 	private String setor;
 	
-	@Column(name = "IP_IHM")
-	private String ipIHM;
+	@Column(name = "SITUACAO")
+	private int situacao;
 	
-	@Column(name = "IP_CLP")
-	private String ipCLP;
+	@Column(name = "SEQUENCIA")
+	private long sequencia;
+	
+	@Column(name = "TEMPO")
+	private long tempo;
+	
+	@Column(name = "OPERADOR")
+	private String operador;
+	
+	@Column(name = "ATIVO")
+	private Boolean ativo;
+	
+	@Column(name = "ULTIMA_ATUALIZACAO")
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date atualizacao;
+	
+	public Maquina() {
+		super();
+	}
 
 	public String getCodigo() {
 		return codigo;
@@ -49,20 +70,52 @@ public class Maquina {
 		this.setor = setor;
 	}
 
-	public String getIpIHM() {
-		return ipIHM;
+	public int getSituacao() {
+		return situacao;
 	}
 
-	public void setIpIHM(String ipIHM) {
-		this.ipIHM = ipIHM;
+	public void setSituacao(int situacao) {
+		this.situacao = situacao;
 	}
 
-	public String getIpCLP() {
-		return ipCLP;
+	public long getSequencia() {
+		return sequencia;
 	}
 
-	public void setIpCLP(String ipCLP) {
-		this.ipCLP = ipCLP;
+	public void setSequencia(long sequencia) {
+		this.sequencia = sequencia;
+	}
+
+	public long getTempo() {
+		return tempo;
+	}
+
+	public void setTempo(long tempo) {
+		this.tempo = tempo;
+	}
+
+	public String getOperador() {
+		return operador;
+	}
+
+	public void setOperador(String operador) {
+		this.operador = operador;
+	}
+
+	public Boolean getAtivo() {
+		return ativo;
+	}
+
+	public void setAtivo(Boolean ativo) {
+		this.ativo = ativo;
+	}
+
+	public Date getAtualizacao() {
+		return atualizacao;
+	}
+
+	public void setAtualizacao(Date atualizacao) {
+		this.atualizacao = atualizacao;
 	}
 		
 }
