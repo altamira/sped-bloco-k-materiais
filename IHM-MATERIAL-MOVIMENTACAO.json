@@ -3,7 +3,7 @@
 1. MOVIMENTACAO DE ESTOQUE (ALTERA QUANTIDADES/MEDIDAS/LOCAL/RESPONSAVEL)
 
 {
-"maquina": "IHMPPALETE",
+"ihm": "IHMPPALETE",
 "datahora": "2015-10-29T12:25:43-0400",
 "operador": "IRANILDO",
 "ordem": 
@@ -25,7 +25,7 @@
 	"numero": 0
       }, 
     "codigo": "ALPCFF01008150000000", 
-    "descricao": "AÇO CHAPA FINA FRIO SAE1008/1010 C/ 1,50MM ESP", 
+    "descricao": "ACO CHAPA FINA FRIO SAE1008/1010 C/ 1,50MM ESP", 
     "emUso": false,
     "local":"AE1",
     "medidas": 
@@ -45,7 +45,7 @@
 	"numero": "314700"
       }, 
     "codigo": "ALPCFF01008150000000", 
-    "descricao": "AÇO CHAPA FINA FRIO SAE1008/1010 C/ 1,50MM ESP", 
+    "descricao": "ACO CHAPA FINA FRIO SAE1008/1010 C/ 1,50MM ESP", 
     "emUso": false,
     "local":"AE1",
     "medidas": 
@@ -96,7 +96,7 @@ CASOS DE USO
 1. ENTRADA NO ALMOXARIFADO POR RECEBIMENTO DE MATERIAL DE TERCEIROS (IHM-MATERIAL-MOVIMENTACAO)
 ------------------------------------------------------------------------------------------------------
 {
-"maquina": "IHMALMTAMAINDE",
+"ihm": "IHMALMTAMAINDE",
 "datahora": "2015-10-29T12:25:43-0200",
 "operador": "NILSON",
 "materiais": 
@@ -105,18 +105,18 @@ CASOS DE USO
     "lote": 
       { 
         "tipo": "01", 
-	"numero": 415
+	    "numero": 292354
       }, 
     "codigo": "ALPRFQ30-KG20000F240", 
-    "descricao": "AÇO LAM PLANO FINA QUENTE PRETO ROLO 30KG/MM2 2,00MM ESP FITA 240MM", 
+    "descricao": "ACO LAM PLANO FINA QUENTE PRETO ROLO 30KG/MM2 2,00MM ESP FITA 240MM", 
     "emUso": false,
     "local":"TAMAINDE-ALMOXARIFADO-E1",
     "medidas": 
       [
-        { "medida": "largura", "unidade": "mm", "valor": 240},
+        { "medida": "largura", "unidade": "mm", "valor": 240.000000},
         { "medida": "espessura", "unidade": "mm", "valor": 2.000000},
         { "medida": "quantidade", "unidade": "pc", "valor": 1},
-        { "medida": "peso", "unidade": "kg", "valor": 2515.861}
+        { "medida": "peso", "unidade": "kg", "valor": 2251.0000000000}
       ]
   }]
 }
@@ -124,35 +124,35 @@ CASOS DE USO
 2. SERVIDOR ENVIA DADOS DA NOVA BOBINA PARA IHM (IHM-MATERIAL-CADASTRO)
 ------------------------------------------------------------------------------------------------------
 {
-"maquina": "IHMALMTAMAINDE",
+"ihm": "IHMALMTAMAINDE",
 "datahora": "2015-10-29T12:25:43-0200",
 "materiais": 
   [{ 
     "lote": 
       { 
         "tipo": "01", 
-	"numero": 415
+	    "numero": 292354
       }, 
     "codigo": "ALPRFQ30-KG20000F240", 
-    "descricao": "AÇO LAM PLANO FINA QUENTE PRETO ROLO 30KG/MM2 2,00MM ESP FITA 240MM", 
+    "descricao": "ACO LAM PLANO FINA QUENTE PRETO ROLO 30KG/MM2 2,00MM ESP FITA 240MM", 
     "emUso": true,
     "local":"TAMAINDE-ALMOXARIFADO-E1",
     "medidas": 
       [
-        { "medida": "largura", "unidade": "mm", "valor": 240},
+        { "medida": "largura", "unidade": "mm", "valor": 240.000000},
         { "medida": "espessura", "unidade": "mm", "valor": 2.000000},
         { "medida": "quantidade", "unidade": "pc", "valor": 1},
         { "medida": "densidade", "unidade": "kg/mm^3", "valor": 0.0000078560},
         { "medida": "comprimento", "unidade": "mm", "valor": 667181.4006000000},
-        { "medida": "peso", "unidade": "kg", "valor": 2515.861}
+        { "medida": "peso", "unidade": "kg", "valor": 2251.0000000000}
       ]
   }]
 }
 
-3. RETIRA A BOBINA DO ALMOXARIFADO E COLOCA NA MÁQUINA COLUNA SIGMA (IHM-MATERIAL-MOVIMENTACAO)
+3. RETIRA A BOBINA DO ALMOXARIFADO E COLOCA NA MAQUINA COLUNA SIGMA (IHM-MATERIAL-MOVIMENTACAO)
 ------------------------------------------------------------------------------------------------------
 {
-"maquina": "IHMSIGMA",
+"ihm": "IHMSIGMA",
 "datahora": "2015-10-29T14:13:56-0200",
 "operador": "IRANILDO",
 "materiais": 
@@ -161,18 +161,18 @@ CASOS DE USO
     "lote": 
       { 
         "tipo": "01", 
-	"numero": 415
+	    "numero": 292354
       }, 
     "codigo": "ALPRFQ30-KG20000F240", 
-    "descricao": "AÇO LAM PLANO FINA QUENTE PRETO ROLO 30KG/MM2 2,00MM ESP FITA 240MM", 
+    "descricao": "ACO LAM PLANO FINA QUENTE PRETO ROLO 30KG/MM2 2,00MM ESP FITA 240MM", 
     "emUso": true,
     "local":"TAMAINDE-COLUNA-SIGMA-E1",
     "medidas": 
       [
-        { "medida": "largura", "unidade": "mm", "valor": 240},
+        { "medida": "largura", "unidade": "mm", "valor": 240.000000},
         { "medida": "espessura", "unidade": "mm", "valor": 2.000000},
         { "medida": "quantidade", "unidade": "pc", "valor": 1},
-        { "medida": "peso", "unidade": "kg", "valor": 2515.861}
+        { "medida": "peso", "unidade": "kg", "valor": 2251.0000000000}
       ]
   },
   { 
@@ -180,18 +180,18 @@ CASOS DE USO
     "lote": 
       { 
         "tipo": "01", 
-	"numero": 415
+	    "numero": 292354
       }, 
     "codigo": "ALPRFQ30-KG20000F240", 
-    "descricao": "AÇO LAM PLANO FINA QUENTE PRETO ROLO 30KG/MM2 2,00MM ESP FITA 240MM", 
+    "descricao": "ACO LAM PLANO FINA QUENTE PRETO ROLO 30KG/MM2 2,00MM ESP FITA 240MM", 
     "emUso": false,
     "local":"TAMAINDE-ALMOXARIFADO-E1",
     "medidas": 
       [
-        { "medida": "largura", "unidade": "mm", "valor": 240},
+        { "medida": "largura", "unidade": "mm", "valor": 240.000000},
         { "medida": "espessura", "unidade": "mm", "valor": 2.000000},
         { "medida": "quantidade", "unidade": "pc", "valor": 1},
-        { "medida": "peso", "unidade": "kg", "valor": 2515.861}
+        { "medida": "peso", "unidade": "kg", "valor": 2251.0000000000}
       ]
   }]
 }
@@ -200,7 +200,7 @@ CASOS DE USO
 4. PRODUZIU 1 pc DE PERFIL LONG SG120 CH14 F240 2300MM, QUANT. OP 125 PCS (IHM-MATERIAL-MOVIMENTACAO)
 ------------------------------------------------------------------------------------------------------
 {
-"maquina": "IHMSIGMA",
+"ihm": "IHMSIGMA",
 "datahora": "2015-10-29T12:25:43-0400",
 "operador": "IRANILDO",
 "ordem": 
@@ -210,8 +210,9 @@ CASOS DE USO
      "situacao": 1,
      "material":
      { 
-       "codigo": "PPPSIG14120240000000", "descricao": "PERFIL LONG SG120 CH14 F240 2300MM", 
-	"medidas": 
+       "codigo": "PPPSIG14120240000000", 
+       "descricao": "PERFIL LONG SG120 CH14 F240 2300MM", 
+	   "medidas": 
    	   [
    	     { "medida": "largura", "unidade": "mm", "valor": 240},
    	     { "medida": "espessura", "unidade": "mm", "valor": 2.000000},
@@ -226,7 +227,7 @@ CASOS DE USO
     "lote": 
       { 
         "tipo": "03", 
-	"numero": 3657
+	    "numero": 125
       }, 
     "codigo": "PPPSIG14120240000000", 
     "descricao": "PERFIL LONG SG120 CH14 F240 2300MM", 
@@ -246,10 +247,10 @@ CASOS DE USO
     "lote": 
       { 
         "tipo": "01", 
-	"numero": 415
+	    "numero": 292354
       }, 
     "codigo": "ALPRFQ30-KG20000F240", 
-    "descricao": "AÇO LAM PLANO FINA QUENTE PRETO ROLO 30KG/MM2 2,00MM ESP FITA 240MM", 
+    "descricao": "ACO LAM PLANO FINA QUENTE PRETO ROLO 30KG/MM2 2,00MM ESP FITA 240MM", 
     "emUso": true,
     "local":"TAMAINDE-COLUNA-SIGMA-E1",
     "medidas": 
@@ -263,10 +264,10 @@ CASOS DE USO
     "lote": 
       { 
         "tipo": "01", 
-	"numero": 415
+	    "numero": 292354
       }, 
     "codigo": "ALPRFQ30-KG20000F240", 
-    "descricao": "AÇO LAM PLANO FINA QUENTE PRETO ROLO 30KG/MM2 2,00MM ESP FITA 240MM", 
+    "descricao": "ACO LAM PLANO FINA QUENTE PRETO ROLO 30KG/MM2 2,00MM ESP FITA 240MM", 
     "emUso": false,
     "local":"TAMAINDE-COLUNA-SIGMA-E1",
     "medidas": 

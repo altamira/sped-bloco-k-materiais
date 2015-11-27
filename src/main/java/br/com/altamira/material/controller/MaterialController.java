@@ -515,38 +515,53 @@ public class MaterialController {
 			
 			for (MaterialMsg materialMsg : movimentoMsg.getMateriais()) {
 				
+				Material material = null;
+				
 				MaterialMovimentoTipo movimentoTipo = materialMovimentoTipoRepository.findOne(materialMsg.getMovimentacao());
 				
-				Material material = materialRepository.findOne(materialMsg.getCodigo());
-	
-				if (material != null) {
+				MaterialInventario lote = materialInventarioRepository.findOne(new MaterialInventarioPK(materialMsg.getLote().getTipo(), materialMsg.getLote().getNumero()));
+				
+				if (lote != null) {
 					
-					MaterialMovimentoItem item = new MaterialMovimentoItem(movimento.getId(), materialMsg.getMovimentacao(), materialMsg.getCodigo(), materialMsg.getLote().getTipo(), materialMsg.getLote().getNumero(), materialMsg.getEmUso(), materialMsg.getLocal());
-
-					materialMovimentoItemRepository.saveAndFlush(item);
+					material = materialRepository.findOne(lote.getMaterial());
 					
-					MaterialInventario lote = materialInventarioRepository.findOne(new MaterialInventarioPK(materialMsg.getLote().getTipo(), materialMsg.getLote().getNumero()));
+					if (movimentoTipo.getOperacao().toUpperCase().startsWith("E")) {
+						lote.setLocal(materialMsg.getLocal());
+						materialInventarioRepository.saveAndFlush(lote);
+					}
 					
-					if (lote != null) {
-						
-						if (movimentoTipo.getOperacao().toUpperCase().startsWith("E")) {
-							lote.setLocal(materialMsg.getLocal());
+				} else {
+					
+					if (movimentoTipo.getGerarLote()) {
+						if (materialMsg.getCodigo().trim().length() > 0) {
+							material = materialRepository.findOne(materialMsg.getCodigo());
+							
+							if (material != null) {
+								lote = new MaterialInventario(new MaterialInventarioPK(materialMsg.getLote().getTipo(), materialMsg.getLote().getNumero()), material.getCodigo(), materialMsg.getLocal());
+								materialInventarioRepository.saveAndFlush(lote);
+							} else {
+								System.out.println(String.format(
+										"\n****************************************************************************\n -----> NAO GEROU LOTE: %s-%s, MATERIAL NAO EXISTE [%s]\n****************************************************************************\n", materialMsg.getLote().getTipo(), materialMsg.getLote().getNumero().toString(), materialMsg.getCodigo()));
+							}
+						} else {
+							System.out.println(String.format(
+									"\n****************************************************************************\n -----> NAO GEROU LOTE: %s-%s, CODIGO DO MATERIAL ESTA EM BRANCO\n****************************************************************************\n", materialMsg.getLote().getTipo(), materialMsg.getLote().getNumero().toString(), materialMsg.getCodigo()));
 						}
 						
 					} else {
-						
-						if (movimentoTipo.getGerarLote()) {
-							lote = new MaterialInventario(new MaterialInventarioPK(materialMsg.getLote().getTipo(), materialMsg.getLote().getNumero()), material.getCodigo(), materialMsg.getLocal());
-						} else {
-							System.out.println(String.format(
-								"\n****************************************************************************\n -----> NAO ENCONTROU/GEROU LOTE: %s-%s\n****************************************************************************\n", materialMsg.getLote().getTipo(), materialMsg.getLote().getNumero().toString()));
-						}
+						System.out.println(String.format(
+							"\n****************************************************************************\n -----> NAO ENCONTROU LOTE: [%s-%s]\n****************************************************************************\n", materialMsg.getLote().getTipo(), materialMsg.getLote().getNumero().toString()));
 					}
-
-					materialInventarioRepository.saveAndFlush(lote);
-
-					Map<String, BigDecimal> variaveis;
+				}
+	
+				if (lote != null && material != null) {
 					
+					MaterialMovimentoItem item = new MaterialMovimentoItem(movimento.getId(), materialMsg.getMovimentacao(), material.getCodigo(), lote.getId().getTipo(), lote.getId().getNumero(), materialMsg.getEmUso(), lote.getLocal());
+
+					materialMovimentoItemRepository.saveAndFlush(item);
+					
+					//Map<String, BigDecimal> variaveis;
+
 					for (MedidaMsg medidaMsg : materialMsg.getMedidas()) {
 						
 						Medida medida = medidaRepository.findByDescricao(medidaMsg.getMedida());
@@ -554,6 +569,7 @@ public class MaterialController {
 						if (medida != null) {
 
 							/*
+				
 							variaveis.put(medida.getCodigo(), medidaMsg.getValor());
 							
 							material.getVariavel().putAll(variaveis);
@@ -582,7 +598,7 @@ public class MaterialController {
 
 							if (loteMedida == null) {
 								
-								loteMedida = new MaterialInventarioMedida(new MaterialInventarioMedidaPK(materialMsg.getLote().getTipo(), materialMsg.getLote().getNumero(), medida.getNome()), medidaMsg.getUnidade(), medidaMsg.getValor());
+								loteMedida = new MaterialInventarioMedida(new MaterialInventarioMedidaPK(lote.getId().getTipo(), lote.getId().getNumero(), medida.getNome()), medidaMsg.getUnidade(), medidaMsg.getValor());
 							
 							} else {
 								
@@ -617,14 +633,14 @@ public class MaterialController {
 							
 						} else {
 							System.out.println(String.format(
-									"\n****************************************************************************\n -----> NAO ENCONTROU MEDIDA: %s\n****************************************************************************\n", medidaMsg.getMedida()));
+									"\n****************************************************************************\n -----> NAO ENCONTROU MEDIDA: [%s]\n****************************************************************************\n", medidaMsg.getMedida()));
 						}
 						
 					}
-					
+						
 				} else {
 					System.out.println(String.format(
-							"\n****************************************************************************\n -----> NAO ENCONTROU MATERIAL: %s\n****************************************************************************\n", materialMsg.getCodigo()));
+							"\n****************************************************************************\n -----> NAO ENCONTROU MATERIAL: [%s]\n****************************************************************************\n", materialMsg.getCodigo()));
 				}
 			}
 		}
