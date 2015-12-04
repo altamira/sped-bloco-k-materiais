@@ -108,6 +108,11 @@ public class MaterialController {
                 .convert(value);
     }
 	
+	@JmsListener(destination = "ECO")
+	public void echo(String msg) {
+		System.out.println("\n\nMensagem recebida:\n-->" + msg.trim() + "<--");
+	}
+	
 	@JmsListener(destination = "MATERIAL-DV-TESTE")
 	public void materialDV(String numeros) {
 		System.out.println("\n\nIniciando teste dos digitos verificadores");
