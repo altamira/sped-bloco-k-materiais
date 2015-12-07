@@ -105,18 +105,18 @@ CASOS DE USO
     "lote": 
       { 
         "tipo": "01", 
-	    "numero": 292354
+	    "numero": 301426
       }, 
-    "codigo": "ALPRFQ30-KG20000F240", 
-    "descricao": "ACO LAM PLANO FINA QUENTE PRETO ROLO 30KG/MM2 2,00MM ESP FITA 240MM", 
+    "codigo": "ALPRFQ24-KG18000F085", 
+    "descricao": "ACO LAM PLANO FINA QUENTE PRETO ROLO 30KG/MM2 1.80MM ESP FITA 85MM", 
     "emUso": false,
     "local":"TAMAINDE-ALMOXARIFADO-E1",
     "medidas": 
       [
-        { "medida": "largura", "unidade": "mm", "valor": 240.000000},
-        { "medida": "espessura", "unidade": "mm", "valor": 2.000000},
+        { "medida": "largura", "unidade": "mm", "valor": 85.000000},
+        { "medida": "espessura", "unidade": "mm", "valor": 1.800000},
         { "medida": "quantidade", "unidade": "pc", "valor": 1},
-        { "medida": "peso", "unidade": "kg", "valor": 2251.0000000000}
+        { "medida": "peso", "unidade": "kg", "valor": 2250.0000000000}
       ]
   }]
 }

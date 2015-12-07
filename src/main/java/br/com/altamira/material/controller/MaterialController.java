@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 
@@ -31,6 +32,7 @@ import br.com.altamira.material.model.MaterialMovimento;
 import br.com.altamira.material.model.MaterialMovimentoItem;
 import br.com.altamira.material.model.MaterialMovimentoItemMedida;
 import br.com.altamira.material.model.MaterialMovimentoTipo;
+import br.com.altamira.material.model.MaterialVariavel;
 import br.com.altamira.material.model.Medida;
 import br.com.altamira.material.model.Unidade;
 import br.com.altamira.material.msg.MaterialMsg;
@@ -46,6 +48,7 @@ import br.com.altamira.material.repository.MaterialMovimentoItemRepository;
 import br.com.altamira.material.repository.MaterialMovimentoRepository;
 import br.com.altamira.material.repository.MaterialMovimentoTipoRepository;
 import br.com.altamira.material.repository.MaterialRepository;
+import br.com.altamira.material.repository.MaterialVariavelRepository;
 import br.com.altamira.material.repository.MedidaRepository;
 import br.com.altamira.material.repository.UnidadeRepository;
 
@@ -64,6 +67,9 @@ public class MaterialController {
 	
 	@Autowired
 	private MaterialMedidaRepository materialMedidaRepository;
+	
+	@Autowired
+	private MaterialVariavelRepository materialVariavelRepository;
 
 	@Autowired
 	private MedidaRepository medidaRepository;
@@ -218,7 +224,7 @@ public class MaterialController {
 		Queue<MaterialMedida> unsolved = new LinkedList<MaterialMedida>();
 		
 		for (MaterialMedida materialMedida : material.getMedidas()) {
-			Expression exp = new Expression(materialMedida.getFormula());
+			Expression exp = new Expression(materialMedida.getConsumo());
 			
 			exp.setVariables(variaveis);
 			
@@ -243,7 +249,7 @@ public class MaterialController {
 		while (!unsolved.isEmpty() && unsolvedCount > 0) {
 			MaterialMedida materialMedida = unsolved.remove();
 			
-			Expression exp = new Expression(materialMedida.getFormula());
+			Expression exp = new Expression(materialMedida.getConsumo());
 			
 			exp.setVariables(variaveis);
 			
@@ -264,7 +270,7 @@ public class MaterialController {
 		
 		while (!unsolved.isEmpty()) {
 			MaterialMedida materialMedida = unsolved.remove();
-			System.out.println(String.format("VALOR NAO RESOLVIDO: %s={%s}", materialMedida.getId().getMedida().getNome(), materialMedida.getFormula()));			
+			System.out.println(String.format("VALOR NAO RESOLVIDO: %s={%s}", materialMedida.getId().getMedida().getNome(), materialMedida.getConsumo()));			
 		}
 		
 		System.out.println(String.format("\n---------------------------------------------------------------------------------------------------\n| %1$15s %2$74s |\n---------------------------------------------------------------------------------------------------\n| %3$95s |\n---------------------------------------------------------------------------------------------------", material.getCodigo(),
@@ -279,7 +285,7 @@ public class MaterialController {
 
 		for (MaterialMedida materialMedida : material.getMedidas()) {
 			
-			Expression exp = new Expression(materialMedida.getFormula());
+			Expression exp = new Expression(materialMedida.getConsumo());
 			
 			exp.setVariables(variaveis);
 			
@@ -344,7 +350,7 @@ public class MaterialController {
 		Queue<MaterialMedida> unsolved = new LinkedList<MaterialMedida>();
 		
 		for (MaterialMedida materialMedida : material.getMedidas()) {
-			Expression exp = new Expression(materialMedida.getFormula());
+			Expression exp = new Expression(materialMedida.getConsumo());
 			
 			exp.setVariables(variaveis);
 			
@@ -369,7 +375,7 @@ public class MaterialController {
 		while (!unsolved.isEmpty() && unsolvedCount > 0) {
 			MaterialMedida materialMedida = unsolved.remove();
 			
-			Expression exp = new Expression(materialMedida.getFormula());
+			Expression exp = new Expression(materialMedida.getConsumo());
 			
 			exp.setVariables(variaveis);
 			
@@ -390,7 +396,7 @@ public class MaterialController {
 		
 		while (!unsolved.isEmpty()) {
 			MaterialMedida materialMedida = unsolved.remove();
-			System.out.println(String.format("VALOR NAO RESOLVIDO: %s={%s}", materialMedida.getId().getMedida().getNome(), materialMedida.getFormula()));			
+			System.out.println(String.format("VALOR NAO RESOLVIDO: %s={%s}", materialMedida.getId().getMedida().getNome(), materialMedida.getConsumo()));			
 		}
 
 		for (MaterialComponente materialComponente : material.getComponentes()) {
@@ -398,7 +404,7 @@ public class MaterialController {
 			unsolved = new LinkedList<MaterialMedida>();
 			
 			for (MaterialMedida materialMedida : materialComponente.getId().getComponente().getMedidas()) {
-				Expression exp = new Expression(materialMedida.getFormula());
+				Expression exp = new Expression(materialMedida.getConsumo());
 				
 				exp.setVariables(variaveis);
 				
@@ -423,7 +429,7 @@ public class MaterialController {
 			while (!unsolved.isEmpty() && unsolvedCount > 0) {
 				MaterialMedida materialMedida = unsolved.remove();
 				
-				Expression exp = new Expression(materialMedida.getFormula());
+				Expression exp = new Expression(materialMedida.getConsumo());
 				
 				exp.setVariables(variaveis);
 				
@@ -444,7 +450,7 @@ public class MaterialController {
 			
 			while (!unsolved.isEmpty()) {
 				MaterialMedida materialMedida = unsolved.remove();
-				System.out.println(String.format("VALOR NAO RESOLVIDO: %s={%s}", materialMedida.getId().getMedida().getNome(), materialMedida.getFormula()));			
+				System.out.println(String.format("VALOR NAO RESOLVIDO: %s={%s}", materialMedida.getId().getMedida().getNome(), materialMedida.getConsumo()));			
 			}
 			
 			materialComponente.getId().getComponente().getVariavel().putAll(variaveis);
@@ -512,6 +518,7 @@ public class MaterialController {
 		ObjectMapper mapper = new ObjectMapper();
 		MovimentoMsg movimentoMsg = mapper.readValue(msg, MovimentoMsg.class);
 
+		// Registra a transação de movimentação de estoque
 		MaterialMovimento movimento = new MaterialMovimento(movimentoMsg.getDatahora(), movimentoMsg.getIHM().toUpperCase(), movimentoMsg.getOperador());
 
 		materialMovimentoRepository.saveAndFlush(movimento);
@@ -524,13 +531,19 @@ public class MaterialController {
 				
 				MaterialMovimentoTipo movimentoTipo = materialMovimentoTipoRepository.findOne(materialMsg.getMovimentacao());
 				
+				if (movimentoTipo == null) {
+					System.out.println(String.format(
+							"\n****************************************************************************\n -----> TIPO DE MOVIMENTO INVALIDO: %s\n****************************************************************************\n", materialMsg.getMovimentacao()));
+					return;
+				}
+				
 				MaterialInventario lote = materialInventarioRepository.findOne(new MaterialInventarioPK(materialMsg.getLote().getTipo(), materialMsg.getLote().getNumero()));
 				
 				if (lote != null) {
 					
 					material = materialRepository.findOne(lote.getMaterial());
 					
-					if (movimentoTipo.getOperacao().toUpperCase().startsWith("E")) {
+					if (movimentoTipo.getOperacao().toUpperCase().trim().equals("E")) {
 						lote.setLocal(materialMsg.getLocal());
 						materialInventarioRepository.saveAndFlush(lote);
 					}
@@ -561,93 +574,188 @@ public class MaterialController {
 	
 				if (lote != null && material != null) {
 					
+					Map<String, BigDecimal> variaveis = new HashMap<String, BigDecimal>();
+
+					Queue<MaterialMedida> unsolved = new LinkedList<MaterialMedida>();
+					
+					// calcula variaveis
+					for (MedidaMsg medidaMsg : materialMsg.getMedidas()) {
+						MaterialVariavel variavel = materialVariavelRepository.findByIdMaterialCodigoAndIdMedidaNome(material.getCodigo(), medidaMsg.getMedida());
+						
+						if (variavel != null) {
+							variaveis.put(variavel.getVariavel(), medidaMsg.getValor());
+							System.out.println(String.format("Material: %s, variavel: %s, valor: %f", material.getCodigo(), variavel.getVariavel(), medidaMsg.getValor()));
+						}
+					}
+					
+					List<MaterialMedida> materialMedidas = materialMedidaRepository.findByIdMaterialCodigo(material.getCodigo());
+					
+					// calcula medidas
+					for (MaterialMedida materialMedida : materialMedidas) {
+						Expression exp = new Expression(materialMedida.getConsumo());
+						
+						exp.setVariables(variaveis);
+						
+						BigDecimal valor = null;
+						
+						try {
+							valor = exp.setPrecision(10).eval();
+						} catch(Exception e) {
+							unsolved.add(materialMedida);
+							System.out.println(String.format(
+									"\n****************************************************************************\n -----> A EXPRESSAO NAO PODE SER AVALIADA: %s [%s] {%s}\n -----> Erro: %s\n****************************************************************************\n", material.getCodigo(), materialMedida.getId().getMedida().getNome(), materialMedida.getConsumo(), e.getMessage()));
+						}
+						
+						if (valor != null) {
+							materialMedida.setValor(valor);
+							variaveis.put(materialMedida.getId().getMedida().getNome(), materialMedida.getValor());
+						}
+						
+					}
+					
+					// calcula o numero máximo de iteracoes até resolver todas as dependencias entre as variaveis
+					int unsolvedCount = (int)Math.pow((double)unsolved.size(), 2);
+					
+					while (!unsolved.isEmpty() && unsolvedCount > 0) {
+						MaterialMedida materialMedida = unsolved.remove();
+						
+						Expression consumo = new Expression(materialMedida.getConsumo());
+						
+						consumo.setVariables(variaveis);
+						
+						BigDecimal valor = null;
+						
+						try {
+							valor = consumo.setPrecision(10).eval();
+						} catch(Exception e) {
+							unsolved.add(materialMedida);
+							unsolvedCount--;
+						}
+						
+						if (valor != null) {
+							materialMedida.setValor(valor);
+							variaveis.put(materialMedida.getId().getMedida().getNome(), materialMedida.getValor());
+							System.out.println(String.format(
+									"\n****************************************************************************\n -----> A EXPRESSAO FOI RESOLVIDA: %s [%s] {%s} = %f\n****************************************************************************\n", material.getCodigo(), materialMedida.getId().getMedida().getNome(), materialMedida.getConsumo(), materialMedida.getValor()));
+
+						}
+					}
+					
+					while (!unsolved.isEmpty()) {
+						MaterialMedida materialMedida = unsolved.remove();
+						System.out.println(String.format(
+								"\n****************************************************************************\n -----> VALOR NAO RESOLVIDO: %s={%s}\n****************************************************************************\n", material.getCodigo(), materialMedida.getId().getMedida().getNome()));
+					}
+
+					// calcula medidas
+					/*for (MaterialMedida materialMedida : materialMedidas) {
+						
+						Medida medida = medidaRepository.findByDescricao(materialMedida.getId().getMedida().getNome());
+						
+						if (medida != null) {
+
+							//MaterialMedida materialMedida = materialMedidaRepository.findByIdMaterialCodigoAndIdMedidaNome(material.getCodigo(), medida.getNome());
+							
+							if (materialMedida != null) {
+								
+								material.getVariavel().putAll(variaveis);
+								
+								Expression consumo = new Expression(materialMedida.getConsumo());
+								
+								consumo.setVariables(variaveis);
+								
+								try {
+									BigDecimal valor = consumo.eval();	
+									variaveis.put(materialMedida.getId().getMedida().getNome(), valor);
+								} catch (Exception e) {
+									System.out.println(String.format(
+											"\n****************************************************************************\n -----> A EXPRESSAO NAO PODE SER AVALIADA: %s [%s] \n****************************************************************************\nErro: %s", material.getCodigo(), medida.getNome(), e.getMessage()));
+								}
+								
+							}
+						}
+					}*/
+
 					MaterialMovimentoItem item = new MaterialMovimentoItem(movimento.getId(), materialMsg.getMovimentacao(), material.getCodigo(), lote.getId().getTipo(), lote.getId().getNumero(), materialMsg.getEmUso(), lote.getLocal());
 
 					materialMovimentoItemRepository.saveAndFlush(item);
 					
-					//Map<String, BigDecimal> variaveis;
-
-					for (MedidaMsg medidaMsg : materialMsg.getMedidas()) {
+					// atualiza saldo inventario e insere medida no movimento de estoque
+					for (MaterialMedida materialMedida : materialMedidas) {
 						
-						Medida medida = medidaRepository.findByDescricao(medidaMsg.getMedida());
+						//Medida medida = medidaRepository.findByDescricao(medidaMsg.getMedida());
 						
-						if (medida != null) {
+						//if (medida != null) {
 
-							/*
-				
-							variaveis.put(medida.getCodigo(), medidaMsg.getValor());
+							//MaterialMedida materialMedida = materialMedidaRepository.findByIdMaterialCodigoAndIdMedidaNome(material.getCodigo(), medida.getNome());
 							
-							material.getVariavel().putAll(variaveis);
-							
-							Expression exp = new Expression(material.getMedidas(). Expressao());
-							
-							exp.setVariables(materialComponente.getId().getComponente().getVariavel());
-							
-							materialComponente.getId().getComponente().getVariavel()
-									.put(materialComponente.getConsumoMedida().getCodigo(), exp.eval());
-							
-							System.out.println(String.format(
-									"%s %s %s [%.3f %s]",
-									tab,
-									materialComponente.getId().getComponente().getCodigo(),
-									replaceVariables(variaveis, materialComponente.getId().getComponente()
-											.getDescricao()),
-											materialComponente.getId().getComponente().getVariavel()
-											.get(materialComponente.getConsumoMedida().getCodigo()),
-											materialComponente.getConsumoMedida().getUnidade()));
-							*/
-							
+							//if (materialMedida != null) {
 
-							
-							MaterialInventarioMedida loteMedida = materialInventarioMedidaRepository.findOne(new MaterialInventarioMedidaPK(materialMsg.getLote().getTipo(), materialMsg.getLote().getNumero(), medida.getNome()));
-
-							if (loteMedida == null) {
+								MaterialInventarioMedida loteMedida = materialInventarioMedidaRepository.findOne(new MaterialInventarioMedidaPK(lote.getId().getTipo(), lote.getId().getNumero(), materialMedida.getId().getMedida().getNome()));
 								
-								loteMedida = new MaterialInventarioMedida(new MaterialInventarioMedidaPK(lote.getId().getTipo(), lote.getId().getNumero(), medida.getNome()), medidaMsg.getUnidade(), medidaMsg.getValor());
-							
-							} else {
+								if (loteMedida == null) {
+									loteMedida = new MaterialInventarioMedida(
+											new MaterialInventarioMedidaPK(
+													lote.getId().getTipo(), 
+													lote.getId().getNumero(), 
+													materialMedida.getId().getMedida().getNome()),
+											materialMedida.getUnidade(),
+											materialMedida.getValor());
+								}
 								
-								if (movimentoTipo.getAlteraSaldoLote()) {
+								if (movimentoTipo.getAlteraSaldoLote() && materialMedida.getSaldo()) {
 									
 									if (movimentoTipo.getOperacao().toUpperCase().startsWith("E")) {
-										loteMedida.setValor(loteMedida.getValor().add(medidaMsg.getValor()));
+										loteMedida.setValor(loteMedida.getValor().add(materialMedida.getValor()));
+									} else if (movimentoTipo.getOperacao().toUpperCase().startsWith("S")) {
+										loteMedida.setValor(loteMedida.getValor().subtract(materialMedida.getValor()));
 									} else {
-										loteMedida.setValor(loteMedida.getValor().subtract(medidaMsg.getValor()));
+										loteMedida.setValor(materialMedida.getValor());
 									}
 
 								}									
-							}
-							
-							materialInventarioMedidaRepository.saveAndFlush(loteMedida);
-
-							MaterialMovimentoItemMedida itemMedida = new MaterialMovimentoItemMedida(item.getId(), medida, medidaMsg.getUnidade(), medidaMsg.getValor());
-							
-							materialMovimentoItemMedidaRepository.saveAndFlush(itemMedida);
-							
-							if (movimentoTipo.getAlteraSaldoMaterial()) {
 								
-								if (movimentoTipo.getOperacao().toUpperCase().startsWith("E")) {
-									//material.setEstoque(material.getEstoque().add(medidaMsg.getValor()));
+								materialInventarioMedidaRepository.saveAndFlush(loteMedida);
+
+								MaterialMovimentoItemMedida itemMedida = new MaterialMovimentoItemMedida(item.getId(), materialMedida.getId().getMedida(), materialMedida.getId().getMedida().getUnidade(), materialMedida.getValor());
+								
+								materialMovimentoItemMedidaRepository.saveAndFlush(itemMedida);
+								
+								/*
+								if (movimentoTipo.getAlteraSaldoMaterial()) {
 									
-								} else {
-									//material.setEstoque(material.getEstoque().subtract(medidaMsg.getValor()));
+									if (movimentoTipo.getOperacao().toUpperCase().startsWith("E")) {
+										//material.setEstoque(material.getEstoque().add(medidaMsg.getValor()));
+										
+									} else {
+										//material.setEstoque(material.getEstoque().subtract(medidaMsg.getValor()));
+									}
+									
+									materialRepository.saveAndFlush(material);
 								}
 								
-								materialRepository.saveAndFlush(material);
+							} else {
+								System.out.println(String.format(
+										"\n****************************************************************************\n -----> NAO ENCONTROU MATERIAL MEDIDA: %s [%s]\n****************************************************************************\n", material.getCodigo(), medida.getNome()));
 							}
 							
 						} else {
 							System.out.println(String.format(
 									"\n****************************************************************************\n -----> NAO ENCONTROU MEDIDA: [%s]\n****************************************************************************\n", medidaMsg.getMedida()));
 						}
+						*/
 						
 					}
 						
 				} else {
 					System.out.println(String.format(
-							"\n****************************************************************************\n -----> NAO ENCONTROU MATERIAL: [%s]\n****************************************************************************\n", materialMsg.getCodigo()));
+							"\n****************************************************************************\n -----> LOTE OU MATERIAL NAO ENCONTRADO: LOTE:[%s, %S], MATERIAL: %s\n****************************************************************************\n", materialMsg.getLote().getTipo(), materialMsg.getLote().getNumero(), material.getCodigo()));
 				}
 			}
+		} else {
+			System.out.println(String.format(
+					"\n****************************************************************************\n -----> MOVIMENTACAO SEM MATERIAL\n****************************************************************************\n"));
+
 		}
 
 	}

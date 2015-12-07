@@ -18,8 +18,14 @@ public class MaterialMedida {
 	@Column(name = "UNIDADE")
 	private String unidade;
 	
-	@Column(name = "FORMULA")
-	private String formula;
+	@Column(name = "CONSUMO")
+	private String consumo;
+	
+	@Column(name = "PERDA")
+	private String perda;
+	
+	@Column(name = "SALDO")
+	private Boolean saldo;
 
 	@Transient
 	private BigDecimal valor;
@@ -28,13 +34,36 @@ public class MaterialMedida {
 		super();
 	}
 
-	public MaterialMedida(MaterialMedidaPK id, String unidade,
-			String formula, BigDecimal valor) {
+	public MaterialMedida(
+			MaterialMedidaPK id, 
+			String unidade,
+			String consumo, 
+			BigDecimal valor) {
+		
 		super();
 		this.id = id;
 		this.unidade = unidade;
-		this.formula = formula;
+		this.consumo = consumo;
 		this.valor = valor;
+		
+	}
+
+	public MaterialMedida(
+			MaterialMedidaPK id, 
+			String unidade, 
+			String consumo,
+			String perda, 
+			Boolean saldo, 
+			BigDecimal valor) {
+		
+		super();
+		this.id = id;
+		this.unidade = unidade;
+		this.consumo = consumo;
+		this.perda = perda;
+		this.saldo = saldo;
+		this.valor = valor;
+		
 	}
 
 	public MaterialMedidaPK getId() {
@@ -53,14 +82,30 @@ public class MaterialMedida {
 		this.unidade = unidade;
 	}
 
-	public String getFormula() {
-		return formula;
+	public String getConsumo() {
+		return consumo;
 	}
 
-	public void setFormula(String formula) {
-		this.formula = formula;
+	public void setConsumo(String consumo) {
+		this.consumo = consumo;
+	}
+	
+	public String getPerda() {
+		return perda;
 	}
 
+	public void setPerda(String perda) {
+		this.perda = perda;
+	}
+
+	public Boolean getSaldo() {
+		return saldo;
+	}
+
+	public void setSaldo(Boolean saldo) {
+		this.saldo = saldo;
+	}
+		
 	public BigDecimal getValor() {
 		return valor;
 	}
@@ -68,5 +113,5 @@ public class MaterialMedida {
 	public void setValor(BigDecimal valor) {
 		this.valor = valor;
 	}
-		
+
 }
