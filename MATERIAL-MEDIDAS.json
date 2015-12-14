@@ -1,11 +1,10 @@
 { 
-    "codigo": "ALPRFQ30-KG20000F240", 
-    "descricao": "AÇO LAM PLANO FINA QUENTE PRETO ROLO 30KG/MM2 2,00MM ESP FITA 240MM", 
+    "codigo": "ALPRFQ24-KG18000F085",
     "medidas": 
       [
-        { "medida": "largura", "unidade": "mm", "valor": 240},
-        { "medida": "espessura", "unidade": "mm", "valor": 2.000000},
+        { "medida": "largura", "unidade": "mm", "valor": 85},
+        { "medida": "espessura", "unidade": "mm", "valor": 1.800000},
         { "medida": "quantidade", "unidade": "pc", "valor": 1},
-        { "medida": "peso", "unidade": "kg", "valor": 2515.861}
+        { "medida": "peso", "unidade": "kg", "valor": 4.1828480000}
       ]
   }
