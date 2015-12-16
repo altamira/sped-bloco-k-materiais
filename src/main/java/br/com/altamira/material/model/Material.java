@@ -1,6 +1,7 @@
 package br.com.altamira.material.model;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -13,6 +14,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
 @Entity
@@ -28,6 +31,10 @@ public class Material {
 	
 	@Column(name = "TIPO", nullable = false)
 	private String tipo;
+	
+	@Column(name = "ULTIMA_ALTERACAO")
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date alteracao = new Date();
 	
 	@OneToMany(/*mappedBy = "id",*/ fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	//@JoinColumns({
@@ -90,6 +97,14 @@ public class Material {
 
 	public void setVariavel(Map<String, BigDecimal> variavel) {
 		this.variavel = variavel;
+	}
+
+	public Date getAlteracao() {
+		return alteracao;
+	}
+
+	public void setAlteracao(Date alteracao) {
+		this.alteracao = alteracao;
 	}
 	
 }

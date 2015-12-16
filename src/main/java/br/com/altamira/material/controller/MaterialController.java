@@ -554,7 +554,7 @@ public class MaterialController {
 					material = materialRepository.findOne(lote.getMaterial());
 					
 					//if (movimentoTipo.getOperacao().toUpperCase().trim().equals("E")) {
-						lote.setLocal(materialMsg.getLocal());
+						lote.setLocal(materialMsg.getLocal().toUpperCase());
 						materialInventarioRepository.saveAndFlush(lote);
 					//}
 					
@@ -565,7 +565,7 @@ public class MaterialController {
 							material = materialRepository.findOne(materialMsg.getCodigo());
 							
 							if (material != null) {
-								lote = new MaterialInventario(new MaterialInventarioPK(materialMsg.getLote().getTipo(), materialMsg.getLote().getNumero()), material.getCodigo(), materialMsg.getLocal());
+								lote = new MaterialInventario(new MaterialInventarioPK(materialMsg.getLote().getTipo(), materialMsg.getLote().getNumero()), material.getCodigo().toUpperCase(), materialMsg.getLocal().toUpperCase());
 								materialInventarioRepository.saveAndFlush(lote);
 							} else {
 								System.out.println(String.format(
@@ -577,9 +577,9 @@ public class MaterialController {
 							}
 						} else {
 							System.out.println(String.format(
-									"\n****************************************************************************\n -----> NAO GEROU LOTE: %s-%s, CODIGO DO MATERIAL ESTA EM BRANCO\n****************************************************************************\n", materialMsg.getLote().getTipo(), materialMsg.getLote().getNumero().toString(), materialMsg.getCodigo()));
+									"\n****************************************************************************\n -----> NAO GEROU LOTE: %s-%s, CODIGO DO MATERIAL ESTA EM BRANCO\n****************************************************************************\n", materialMsg.getLote().getTipo(), materialMsg.getLote().getNumero().toString(), materialMsg.getCodigo().toUpperCase()));
 							
-							MaterialMovimentoLogErro erro = new MaterialMovimentoLogErro(new Date(), movimento.getId(), String.format("NAO GEROU LOTE: %s-%s, CODIGO DO MATERIAL ESTA EM BRANCO", materialMsg.getLote().getTipo(), materialMsg.getLote().getNumero().toString(), materialMsg.getCodigo()), msg);
+							MaterialMovimentoLogErro erro = new MaterialMovimentoLogErro(new Date(), movimento.getId(), String.format("NAO GEROU LOTE: %s-%s, CODIGO DO MATERIAL ESTA EM BRANCO", materialMsg.getLote().getTipo(), materialMsg.getLote().getNumero().toString(), materialMsg.getCodigo().toUpperCase()), msg);
 							materialMovimentoLogErroRepository.saveAndFlush(erro);
 							
 						}
