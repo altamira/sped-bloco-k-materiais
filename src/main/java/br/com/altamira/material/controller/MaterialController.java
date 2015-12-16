@@ -553,10 +553,10 @@ public class MaterialController {
 					
 					material = materialRepository.findOne(lote.getMaterial());
 					
-					if (movimentoTipo.getOperacao().toUpperCase().trim().equals("E")) {
+					//if (movimentoTipo.getOperacao().toUpperCase().trim().equals("E")) {
 						lote.setLocal(materialMsg.getLocal());
 						materialInventarioRepository.saveAndFlush(lote);
-					}
+					//}
 					
 				} else {
 					
@@ -627,8 +627,10 @@ public class MaterialController {
 							System.out.println(String.format(
 									"\n****************************************************************************\n -----> A EXPRESSAO NAO PODE SER AVALIADA: %s [%s] {%s}\n -----> Erro: %s\n****************************************************************************\n", material.getCodigo(), materialMedida.getId().getMedida().getNome(), materialMedida.getConsumo(), e.getMessage()));
 							
-							MaterialMovimentoLogErro erro = new MaterialMovimentoLogErro(new Date(), movimento.getId(), String.format("A EXPRESSAO NAO PODE SER AVALIADA: %s [%s] {%s}\n -----> Erro: %s", material.getCodigo(), materialMedida.getId().getMedida().getNome(), materialMedida.getConsumo(), e.getMessage()), msg);
+							/*
+							MaterialMovimentoLogErro erro = new MaterialMovimentoLogErro(new Date(), movimento.getId(), String.format("A EXPRESSAO NAO PODE SER AVALIADA: %s [%s] {%s}", material.getCodigo(), materialMedida.getId().getMedida().getNome(), materialMedida.getConsumo()), msg);
 							materialMovimentoLogErroRepository.saveAndFlush(erro);
+							*/
 							
 						}
 						
@@ -639,10 +641,17 @@ public class MaterialController {
 						
 					}
 					
-					// calcula o numero máximo de iteracoes até resolver todas as dependencias entre as variaveis
-					int unsolvedCount = (int)Math.pow((double)unsolved.size(), 2);
+					int iteracoes = 0;
 					
-					while (!unsolved.isEmpty() && unsolvedCount > 0) {
+					/* para evitar loop infinito, caso a expressão não tenha solução
+					 * calcula o número máximo de iteracoes necessárias 
+					 * para resolver todas as dependeências entre as variaveis
+					 */
+					for (int i = unsolved.size(); i > 0; i--) {
+						iteracoes += i;
+					}
+									
+					while (!unsolved.isEmpty() && iteracoes > 0) {
 						MaterialMedida materialMedida = unsolved.remove();
 						
 						Expression consumo = new Expression(materialMedida.getConsumo());
@@ -655,17 +664,19 @@ public class MaterialController {
 							valor = consumo.setPrecision(10).eval();
 						} catch(Exception e) {
 							unsolved.add(materialMedida);
-							unsolvedCount--;
+							iteracoes--;
 						}
 						
 						if (valor != null) {
 							materialMedida.setValor(valor);
 							variaveis.put(materialMedida.getId().getMedida().getNome(), materialMedida.getValor());
 							System.out.println(String.format(
-									"\n****************************************************************************\n -----> A EXPRESSAO FOI RESOLVIDA: %s [%s] {%s} = %f\n****************************************************************************\n", material.getCodigo(), materialMedida.getId().getMedida().getNome(), materialMedida.getConsumo(), materialMedida.getValor()));
+									"\n****************************************************************************\n -----> A EXPRESSAO FOI RESOLVIDA: %s [%s] {%s} = %f, Quant. de Iterações necessárias: %d\n****************************************************************************\n", material.getCodigo(), materialMedida.getId().getMedida().getNome(), materialMedida.getConsumo(), materialMedida.getValor(), iteracoes));
 							
+							/*
 							MaterialMovimentoLogErro erro = new MaterialMovimentoLogErro(new Date(), movimento.getId(), String.format("A EXPRESSAO FOI RESOLVIDA: %s [%s] {%s} = %f", material.getCodigo(), materialMedida.getId().getMedida().getNome(), materialMedida.getConsumo(), materialMedida.getValor()), msg);
 							materialMovimentoLogErroRepository.saveAndFlush(erro);
+							*/
 							
 						}
 					}

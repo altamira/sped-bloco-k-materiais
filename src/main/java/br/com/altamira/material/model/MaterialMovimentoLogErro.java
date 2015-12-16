@@ -27,10 +27,10 @@ public class MaterialMovimentoLogErro {
 	@Column(name = "MOVIMENTO")
 	private long movimento;
 	
-	@Column(name = "ERRO")
+	@Column(name = "ERRO", columnDefinition = "VARCHAR(255)")
 	private String erro;
 	
-	@Column(name = "MENSAGEM")
+	@Column(name = "MENSAGEM", columnDefinition = "CLOB NULL")
 	private String mensagem;
 
 	public MaterialMovimentoLogErro() {
@@ -40,7 +40,7 @@ public class MaterialMovimentoLogErro {
 	public MaterialMovimentoLogErro(Date datahora, String erro, String mensagem) {
 		super();
 		this.datahora = datahora;
-		this.erro = erro;
+		this.erro = erro.substring(0, 255);
 		this.mensagem = mensagem;
 	}
 
@@ -49,7 +49,7 @@ public class MaterialMovimentoLogErro {
 		super();
 		this.datahora = datahora;
 		this.movimento = movimento;
-		this.erro = erro;
+		this.erro = erro.substring(0, 255);
 		this.mensagem = mensagem;
 	}
 
@@ -82,7 +82,7 @@ public class MaterialMovimentoLogErro {
 	}
 
 	public void setErro(String erro) {
-		this.erro = erro;
+		this.erro = erro.substring(0, 255);
 	}
 
 	public String getMensagem() {
