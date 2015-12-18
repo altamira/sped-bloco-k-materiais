@@ -3,6 +3,7 @@ package br.com.altamira.material.controller;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -11,11 +12,18 @@ import java.util.Map;
 import java.util.Queue;
 
 import javax.measure.unit.Unit;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 
+import org.hibernate.Criteria;
+import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.annotation.JmsListener;
-import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 import br.com.altamira.data.wbccad.model.Prdorc;
 import br.com.altamira.material.expression.Expression;
@@ -59,9 +67,12 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-@Controller
+//@Controller
+@RestController
+@Transactional
+@RequestMapping("/material")
 public class MaterialController {
-
+	
 	@Autowired
 	private MaterialRepository materialRepository;
 
@@ -505,6 +516,7 @@ public class MaterialController {
 		return texto;
 	}
 
+	
 	/**
 	 * Esta rotina é responsável pela movimentacao e calculo de saldos de estoque dos materiais
 	 * 
@@ -515,8 +527,9 @@ public class MaterialController {
 	 * @throws ParseException
 	 */
 	@Transactional
+	@RequestMapping(value = "/movimentacao", method = RequestMethod.POST)
 	@JmsListener(destination = "IHM-MATERIAL-MOVIMENTACAO")
-	public void materialMovimento(String msg) throws JsonParseException,
+	public void materialMovimento(@RequestBody String msg) throws JsonParseException,
 			JsonMappingException, IOException, ParseException {
 		System.out.println(String.format(
 				"\n--------------------------------------------------------------------------------\nCHEGOU MENSAGEM DE IHM-MATERIAL-MOVIMENTACAO\n--------------------------------------------------------------------------------\n%s\n--------------------------------------------------------------------------------\n", msg));
@@ -539,7 +552,7 @@ public class MaterialController {
 				
 				if (movimentoTipo == null) {
 					System.out.println(String.format(
-							"\n****************************************************************************\n -----> TIPO DE MOVIMENTO INVALIDO: %s\n****************************************************************************\n", materialMsg.getMovimentacao()));
+							"\n****************************************************************************\n TIPO DE MOVIMENTO INVALIDO: %s\n****************************************************************************\n", materialMsg.getMovimentacao()));
 					
 					MaterialMovimentoLogErro erro = new MaterialMovimentoLogErro(new Date(), movimento.getId(), String.format("TIPO DE MOVIMENTO INVALIDO: %s", materialMsg.getMovimentacao()), msg);
 					materialMovimentoLogErroRepository.saveAndFlush(erro);
@@ -569,7 +582,7 @@ public class MaterialController {
 								materialInventarioRepository.saveAndFlush(lote);
 							} else {
 								System.out.println(String.format(
-										"\n****************************************************************************\n -----> NAO GEROU LOTE: %s-%s, MATERIAL NAO EXISTE [%s]\n****************************************************************************\n", materialMsg.getLote().getTipo(), materialMsg.getLote().getNumero().toString(), materialMsg.getCodigo()));
+										"\n****************************************************************************\n NAO GEROU LOTE: %s-%s, MATERIAL NAO EXISTE [%s]\n****************************************************************************\n", materialMsg.getLote().getTipo(), materialMsg.getLote().getNumero().toString(), materialMsg.getCodigo()));
 								
 								MaterialMovimentoLogErro erro = new MaterialMovimentoLogErro(new Date(), movimento.getId(), String.format("NAO GEROU LOTE: %s-%s, MATERIAL NAO EXISTE [%s]", materialMsg.getLote().getTipo(), materialMsg.getLote().getNumero().toString(), materialMsg.getCodigo()), msg);
 								materialMovimentoLogErroRepository.saveAndFlush(erro);
@@ -577,7 +590,7 @@ public class MaterialController {
 							}
 						} else {
 							System.out.println(String.format(
-									"\n****************************************************************************\n -----> NAO GEROU LOTE: %s-%s, CODIGO DO MATERIAL ESTA EM BRANCO\n****************************************************************************\n", materialMsg.getLote().getTipo(), materialMsg.getLote().getNumero().toString(), materialMsg.getCodigo().toUpperCase()));
+									"\n****************************************************************************\n NAO GEROU LOTE: %s-%s, CODIGO DO MATERIAL ESTA EM BRANCO\n****************************************************************************\n", materialMsg.getLote().getTipo(), materialMsg.getLote().getNumero().toString(), materialMsg.getCodigo().toUpperCase()));
 							
 							MaterialMovimentoLogErro erro = new MaterialMovimentoLogErro(new Date(), movimento.getId(), String.format("NAO GEROU LOTE: %s-%s, CODIGO DO MATERIAL ESTA EM BRANCO", materialMsg.getLote().getTipo(), materialMsg.getLote().getNumero().toString(), materialMsg.getCodigo().toUpperCase()), msg);
 							materialMovimentoLogErroRepository.saveAndFlush(erro);
@@ -586,7 +599,7 @@ public class MaterialController {
 						
 					} else {
 						System.out.println(String.format(
-							"\n****************************************************************************\n -----> NAO ENCONTROU LOTE: [%s-%s]\n****************************************************************************\n", materialMsg.getLote().getTipo(), materialMsg.getLote().getNumero().toString()));
+							"\n****************************************************************************\n NAO ENCONTROU LOTE: [%s-%s]\n****************************************************************************\n", materialMsg.getLote().getTipo(), materialMsg.getLote().getNumero().toString()));
 						
 						MaterialMovimentoLogErro erro = new MaterialMovimentoLogErro(new Date(), movimento.getId(), String.format("NAO ENCONTROU LOTE: [%s-%s]", materialMsg.getLote().getTipo(), materialMsg.getLote().getNumero().toString()), msg);
 						materialMovimentoLogErroRepository.saveAndFlush(erro);
@@ -624,8 +637,8 @@ public class MaterialController {
 							valor = exp.setPrecision(10).eval();
 						} catch(Exception e) {
 							unsolved.add(materialMedida);
-							System.out.println(String.format(
-									"\n****************************************************************************\n -----> A EXPRESSAO NAO PODE SER AVALIADA: %s [%s] {%s}\n -----> Erro: %s\n****************************************************************************\n", material.getCodigo(), materialMedida.getId().getMedida().getNome(), materialMedida.getConsumo(), e.getMessage()));
+							/*System.out.println(String.format(
+									"\n****************************************************************************\n A EXPRESSAO NAO PODE SER AVALIADA: %s [%s] {%s}\n Erro: %s\n****************************************************************************\n", material.getCodigo(), materialMedida.getId().getMedida().getNome(), materialMedida.getConsumo(), e.getMessage()));*/
 							
 							/*
 							MaterialMovimentoLogErro erro = new MaterialMovimentoLogErro(new Date(), movimento.getId(), String.format("A EXPRESSAO NAO PODE SER AVALIADA: %s [%s] {%s}", material.getCodigo(), materialMedida.getId().getMedida().getNome(), materialMedida.getConsumo()), msg);
@@ -670,8 +683,8 @@ public class MaterialController {
 						if (valor != null) {
 							materialMedida.setValor(valor);
 							variaveis.put(materialMedida.getId().getMedida().getNome(), materialMedida.getValor());
-							System.out.println(String.format(
-									"\n****************************************************************************\n -----> A EXPRESSAO FOI RESOLVIDA: %s [%s] {%s} = %f, Quant. de Iterações necessárias: %d\n****************************************************************************\n", material.getCodigo(), materialMedida.getId().getMedida().getNome(), materialMedida.getConsumo(), materialMedida.getValor(), iteracoes));
+							/*System.out.println(String.format(
+									"\n****************************************************************************\n A EXPRESSAO FOI RESOLVIDA: %s [%s] {%s} = %f\n Quant. de Iterações necessárias: %d\n****************************************************************************\n", material.getCodigo(), materialMedida.getId().getMedida().getNome(), materialMedida.getConsumo(), materialMedida.getValor(), iteracoes));*/
 							
 							/*
 							MaterialMovimentoLogErro erro = new MaterialMovimentoLogErro(new Date(), movimento.getId(), String.format("A EXPRESSAO FOI RESOLVIDA: %s [%s] {%s} = %f", material.getCodigo(), materialMedida.getId().getMedida().getNome(), materialMedida.getConsumo(), materialMedida.getValor()), msg);
@@ -684,7 +697,7 @@ public class MaterialController {
 					while (!unsolved.isEmpty()) {
 						MaterialMedida materialMedida = unsolved.remove();
 						System.out.println(String.format(
-								"\n****************************************************************************\n -----> VALOR NAO RESOLVIDO: %s={%s}\n****************************************************************************\n", material.getCodigo(), materialMedida.getId().getMedida().getNome()));
+								"\n****************************************************************************\n VALOR NAO RESOLVIDO: %s={%s}\n****************************************************************************\n", material.getCodigo(), materialMedida.getId().getMedida().getNome()));
 						
 						MaterialMovimentoLogErro erro = new MaterialMovimentoLogErro(new Date(), movimento.getId(), String.format("VALOR NAO RESOLVIDO: %s={%s}", material.getCodigo(), materialMedida.getId().getMedida().getNome()), msg);
 						materialMovimentoLogErroRepository.saveAndFlush(erro);
@@ -713,7 +726,7 @@ public class MaterialController {
 									variaveis.put(materialMedida.getId().getMedida().getNome(), valor);
 								} catch (Exception e) {
 									System.out.println(String.format(
-											"\n****************************************************************************\n -----> A EXPRESSAO NAO PODE SER AVALIADA: %s [%s] \n****************************************************************************\nErro: %s", material.getCodigo(), medida.getNome(), e.getMessage()));
+											"\n****************************************************************************\n A EXPRESSAO NAO PODE SER AVALIADA: %s [%s] \n****************************************************************************\nErro: %s", material.getCodigo(), medida.getNome(), e.getMessage()));
 								}
 								
 							}
@@ -782,12 +795,12 @@ public class MaterialController {
 								
 							} else {
 								System.out.println(String.format(
-										"\n****************************************************************************\n -----> NAO ENCONTROU MATERIAL MEDIDA: %s [%s]\n****************************************************************************\n", material.getCodigo(), medida.getNome()));
+										"\n****************************************************************************\n NAO ENCONTROU MATERIAL MEDIDA: %s [%s]\n****************************************************************************\n", material.getCodigo(), medida.getNome()));
 							}
 							
 						} else {
 							System.out.println(String.format(
-									"\n****************************************************************************\n -----> NAO ENCONTROU MEDIDA: [%s]\n****************************************************************************\n", medidaMsg.getMedida()));
+									"\n****************************************************************************\n NAO ENCONTROU MEDIDA: [%s]\n****************************************************************************\n", medidaMsg.getMedida()));
 						}
 						*/
 						
@@ -795,16 +808,16 @@ public class MaterialController {
 						
 				} else {
 					System.out.println(String.format(
-							"\n****************************************************************************\n -----> LOTE OU MATERIAL NAO ENCONTRADO: LOTE:[%s, %S], MATERIAL: %s\n****************************************************************************\n", materialMsg.getLote().getTipo(), materialMsg.getLote().getNumero(), material.getCodigo()));
+							"\n****************************************************************************\n LOTE OU MATERIAL NAO ENCONTRADO: LOTE:[%s, %s], MATERIAL: %s\n****************************************************************************\n", materialMsg.getLote().getTipo(), materialMsg.getLote().getNumero(), materialMsg.getCodigo()));
 					
-					MaterialMovimentoLogErro erro = new MaterialMovimentoLogErro(new Date(), movimento.getId(), String.format("LOTE OU MATERIAL NAO ENCONTRADO: LOTE:[%s, %S], MATERIAL: %s", materialMsg.getLote().getTipo(), materialMsg.getLote().getNumero(), material.getCodigo()), msg);
+					MaterialMovimentoLogErro erro = new MaterialMovimentoLogErro(new Date(), movimento.getId(), String.format("LOTE OU MATERIAL NAO ENCONTRADO: LOTE:[%s, %s], MATERIAL: %s", materialMsg.getLote().getTipo(), materialMsg.getLote().getNumero(), materialMsg.getCodigo()), msg);
 					materialMovimentoLogErroRepository.saveAndFlush(erro);
 					
 				}
 			}
 		} else {
 			System.out.println(String.format(
-					"\n****************************************************************************\n -----> MOVIMENTACAO SEM MATERIAL\n****************************************************************************\n"));
+					"\n****************************************************************************\n MOVIMENTACAO SEM MATERIAL\n****************************************************************************\n"));
 			
 			MaterialMovimentoLogErro erro = new MaterialMovimentoLogErro(new Date(), movimento.getId(), "MOVIMENTACAO SEM MATERIAL", msg);
 			materialMovimentoLogErroRepository.saveAndFlush(erro);
@@ -812,5 +825,48 @@ public class MaterialController {
 		}
 
 	}
+	
+	@PersistenceContext
+	EntityManager entityManager;
+	
+	@Autowired
+	private SessionFactory sessionFactory;
+	
+	@RequestMapping("/inventario")
+	public List<Map<String, Object>> Inventario() {
+		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
+		
+		List data = sessionFactory.getCurrentSession().createSQLQuery("exec INVENTARIO").setResultTransformer(Criteria.ALIAS_TO_ENTITY_MAP).list();
+		
+		for (Object object : data)
+		{
+			Map row = (Map)object;
+			
+			System.out.println(row);
+			list.add(row);
 
+		}
+		
+		
+		
+		/*entityManager.creates
+		//.createNativeQuery("exec INVENTARIO");  
+		javax.persistence.Query query = entityManager.createNamedStoredProcedureQuery("inventario").getr
+		
+		@SuppressWarnings("unchecked")
+		List<Object[]> result = query.;
+		
+		for (Object[] fields : result) {
+			
+			for (Object field : fields) {
+				System.out.println(field);
+			}
+
+		}*/
+		
+		
+		
+		return list;
+	}
+	
 }

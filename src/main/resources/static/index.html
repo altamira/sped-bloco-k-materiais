@@ -28,12 +28,12 @@ Use search to find needed section.
 
 <!--[if IE 8]>         <html class="ie8"> <![endif]-->
 <!--[if IE 9]>         <html class="ie9 gt-ie8"> <![endif]-->
-<!--[if gt IE 9]><!--> <html class="gt-ie8 gt-ie9 not-ie" ng-app="monitor"> <!--<![endif]-->
+<!--[if gt IE 9]><!--> <html class="gt-ie8 gt-ie9 not-ie" ng-app="App"> <!--<![endif]-->
 
 <head>
-	<meta charset="utf-8">
+	<meta charset="UTF-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-	<title>Altamira - Monitoramento</title>
+	<title>Altamira - Almoxarifado</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 
 	<!-- Open Sans font from Google CDN -->
@@ -46,12 +46,15 @@ Use search to find needed section.
 	<link href="assets/stylesheets/rtl.min.css" rel="stylesheet" type="text/css">
 	<link href="assets/stylesheets/themes.min.css" rel="stylesheet" type="text/css">
 
+	<link href="almoxarifado.css" rel="stylesheet" type="text/css">
+
     <!-- libraries -->
-    <script src="../lib/js/angular.min.js"></script>
-    <script src="../lib/js/angular-route.min.js"></script>
-    <script src="../lib/js/sockjs.min.js"></script>
+    <script src="lib/js/angular.min.js"></script>
+    <script src="lib/js/angular-route.min.js"></script>
+    <script src="lib/js/sockjs.min.js"></script>
+    <script src="lib/js/stomp.js"></script>
     <!-- <script src="../lib/js/highlight.min.js"></script> -->
-    <script src="../app.js"></script>
+    <script src="app.js"></script>
 
 	<!--[if lt IE 9]>
 		<script src="assets/javascripts/ie.min.js"></script>
@@ -391,12 +394,13 @@ Use search to find needed section.
 			</div>
 			<ul class="navigation">
 				<li class="mm-dropdown active" ng-controller="MenuCtrl as menu">
-					<a href="#/dashboard"><i class="menu-icon fa fa-dashboard"></i><span class="mm-text">Painel de Controle</span><span ng-show="menu.count" class="badge badge-danger">{{ menu.count }}</span></a>
+					<a href="http://fabrica.grupo.altamira.com.br/#/dashboard"><i class="menu-icon fa fa-dashboard"></i><span class="mm-text">Painel de Controle</span><span ng-show="menu.count" class="badge badge-danger">{{ menu.count }}</span></a>
 					<ul>
 						<!-- inicio do menu lateral dinamico -->
 						<li ng-repeat="item in menu.options">
-							<a tabindex="-1" href="#/maq?{{ item.codigo }}"><span class="mm-text">{{ item.nome }}</span><span class="badge badge-{{ item.situacao | statusClass }}">{{ item.tempo }}s</span></a>
+							<a tabindex="-1" href="http://fabrica.grupo.altamira.com.br/#/maquina/{{ item.codigo }}"><span class="mm-text">{{ item.nome }}</span><span class="badge badge-{{ item.situacao | statusClass }}">{{ item.tempo }}</span></a>
 						</li>
+
 						<!-- <li>
 							<a tabindex="-1" href="#"><span class="mm-text">Porta Palete Normal</span><span class="badge badge-danger">15h 12m</span></a>
 						</li>
@@ -468,6 +472,22 @@ Use search to find needed section.
 						</li> -->
 					</ul>
 				</li>
+
+				<li class="mm-dropdown active">
+					<a href="#/almoxarifado"><i class="menu-icon fa fa-dashboard"></i><span class="mm-text">Almoxarifado</span></a>
+					<ul>
+
+						<li>
+							<a tabindex="-1" href="#/movimentacao"><span class="mm-text">Saida Total</span></a>
+						</li>
+
+						<li>
+							<a tabindex="-1" href="#/baixa"><span class="mm-text">Saida Parcial</span></a>
+						</li>
+
+					</ul>
+				</li>
+		
 				<!-- fim do menu lateral dinamico -->
 				<!-- <li>
 					<a href="index.html"><i class="menu-icon fa fa-dashboard"></i><span class="mm-text">Dashboard</span></a>
@@ -611,7 +631,7 @@ Use search to find needed section.
 						</li>
 					</ul>
 				</li>
-			</ul> --><!-- / .navigation -->
+			</ul> --> <!-- / .navigation -->
 			<!-- <div class="menu-content">
 				<a href="pages-invoice.html" class="btn btn-primary btn-block btn-outline dark">Create Invoice</a>
 			</div> -->

@@ -1,0 +1,89 @@
+'<div ng-controller="MaquinaCtrl as maquina">
+	<ul class="breadcrumb breadcrumb-page">
+		<div class="breadcrumb-label text-light-gray">Voce esta aqui: </div>
+		<li><a href="#">Home</a></li>
+		<li class="active"><a href="#">{{ maq.nome }}</a></li>
+	</ul>
+	<div class="page-header">
+		
+		<div class="row">
+			<!-- Page header, center on small screens -->
+			<h1 class="col-xs-12 col-sm-12 text-center text-left-sm"><i class="fa fa-dashboard page-header-icon"></i>&nbsp;&nbsp;{{ maquina.data.nome }}</h1>
+			<h5 ng-repeat="ihm in maquina.data.ihm" class="col-xs-12 col-sm-12 text-center text-left-sm">&nbsp;&nbsp;IHM versao: {{ ihm.versao }} IP: {{ ihm.ip }} </h5>
+		</div>
+	</div> <!-- / .page-header -->
+
+
+	<div class="row">
+		<div class="col-xs-12">
+			<div class="stat-panel">
+				<div class="stat-row">
+					<!-- Small horizontal padding, bordered, without right border, top aligned text -->
+					<div class="stat-cell col-sm-4 col-md-4 padding-sm-hr bordered no-border-r valign-top">
+						<!-- Small padding, without top padding, extra small horizontal padding -->
+						<h4 class="padding-sm no-padding-t padding-xs-hr"><i class="fa fa-cloud-upload text-primary"></i>&nbsp;&nbsp;Estatistica</h4>
+						<!-- Without margin -->
+						<ul class="list-group no-margin">
+							<!-- Without left and right borders, extra small horizontal padding, without background, no border radius -->
+							<li class="list-group-item no-border-hr no-border-b padding-xs-hr no-bg" ng-repeat="situacao in maquina.data.sumario">
+								{{ situacao.descricao }} <span class="label label-danger pull-right">{{ situacao.tempo | timeFormat }}</span> <span class="label {{ situacao.situacao | statusPanelClass }} pull-right"> {{ situacao.percentual }}%</span>
+							</li> <!-- / .list-group-item -->
+							<!-- Without left and right borders, extra small horizontal padding, without background -->
+							<li class="list-group-item no-border-hr padding-xs-hr no-bg">
+								Total <span class="label label-danger pull-right">{{ maquina.total | timeFormat }}</span>
+							</li>  <!-- / .list-group-item -->
+							<!-- Without left and right borders, without bottom border, extra small horizontal padding, without background -->
+							<!--<li class="list-group-item no-border-hr no-border-b padding-xs-hr no-bg">
+								Videos <span class="label label-success pull-right">12</span>
+							</li> --> <!-- / .list-group-item -->
+						</ul>
+					</div> <!-- /.stat-cell -->
+					<!-- Primary background, small padding, vertically centered text -->
+					<div class="stat-cell col-xs-12 col-sm-8 col-md-8 bg-primary padding-sm valign-middle">
+						<!-- <div id="hero-graph" class="graph" style="height: 230px;"></div>-->
+						<!-- <barchart class="graph" xkey="xkey" ykeys="ykeys" labels="labels" data="myModel"></barchart>-->
+						<barchart class="graph" xkey="xkey" ykeys="ykeys" labels="labels" data-value="{{myModel}}"></barchart>
+					</div>
+				</div>
+			</div> <!-- /.stat-panel -->
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="col-sm-12">
+			<div class="stat-panel">
+				<div class="stat-row">
+					<div class="table-primary">
+						<div class="table-header">
+							<div class="table-caption">Log de monitoramento
+							</div>
+						</div>
+						<table class="table table-bordered">
+					        <thead>
+					        <tr>
+					        	<th>#</th>
+					            <th>Data e Hora</th>
+					            <th>Recebido em</th>
+					            <th>Modo de Operacao</th>
+					            <th>Usuario</th>
+					            <th>Tempo Atividade</th>
+					        </tr>
+					        </thead>
+					        <tbody>
+					        <tr class="panel {{ row.modo | statusPanelClass }}" ng-repeat="row in maquina.data.log">
+					        	<td>{{ row.sequencia }}</td>
+					            <td>{{ row.datahora | date : 'medium' }}</td>
+					        	<td>{{ row.recebidoEm | date : 'medium' }}</td>
+					            <td>{{ row.modo | statusName }}</td>
+					            <td>{{ row.operador }}</td>
+					            <td>{{ row.tempo | dayFormat }}</td>
+					        </tr>
+					        </tbody>
+					    </table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div> <!-- / #content-wrapper -->
+'

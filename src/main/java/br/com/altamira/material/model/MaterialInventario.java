@@ -9,13 +9,26 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinColumns;
+import javax.persistence.NamedStoredProcedureQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.ParameterMode;
+import javax.persistence.StoredProcedureParameter;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 @Entity
 @Table(name = "MATERIAL_INVENTARIO")
+/*@NamedNativeQueries({
+    @NamedNativeQuery(
+            name = "Inventario",
+            query = "EXEC [dbo].[INVENTARIO]",
+            resultClass = MaterialInventario.class
+    )
+ })*/
+@NamedStoredProcedureQuery(name = "MaterialInventario.inventario", procedureName = "INVENTARIO", parameters = {
+		  /*@StoredProcedureParameter(mode = ParameterMode.IN, name = "arg", type = Integer.class),
+		  @StoredProcedureParameter(mode = ParameterMode.OUT, name = "result", type = Integer.class)*/ })
 public class MaterialInventario {
 
 	@EmbeddedId

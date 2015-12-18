@@ -40,7 +40,7 @@ public class MaterialMovimentoLogErro {
 	public MaterialMovimentoLogErro(Date datahora, String erro, String mensagem) {
 		super();
 		this.datahora = datahora;
-		this.erro = erro.substring(0, 255);
+		this.erro = erro.substring(0, Math.min(erro.length(), 255)); 
 		this.mensagem = mensagem;
 	}
 
@@ -49,7 +49,7 @@ public class MaterialMovimentoLogErro {
 		super();
 		this.datahora = datahora;
 		this.movimento = movimento;
-		this.erro = erro.substring(0, 255);
+		this.erro = erro.substring(0, Math.min(erro.length(), 255)); 
 		this.mensagem = mensagem;
 	}
 
@@ -82,7 +82,7 @@ public class MaterialMovimentoLogErro {
 	}
 
 	public void setErro(String erro) {
-		this.erro = erro.substring(0, 255);
+		this.erro = erro.substring(0, Math.min(erro.length(), 255)); 
 	}
 
 	public String getMensagem() {

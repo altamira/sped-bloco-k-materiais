@@ -1,0 +1,31 @@
+<div class="almoxarifado" ng-controller="AlmoxarifadoCtrl">
+	<header class="w3-container w3-teal">
+	</header>
+	<h1 ng-if="msg.length" class="erro">{{ msg }}</h1>
+	<article>
+		<!--<h2>Movimenta&ccedil;&atilde;o de Estoque</h2>-->
+		<h1 ng-if="valid">{{ lote.material.codigo }}<br>{{ lote.material.descricao }}</h1>
+		<ul>
+			<li ng-repeat="medida in lote.material.medidas"><em>{{ medida.medida }}</em>: {{ medida.valor }} {{ medida.unidade }}</li>
+		</ul>
+		<h1 ng-if="!valid">Digite um c&oacute;digo de barras : <b>{{ barcode }}</b></h1>
+		<h1 ng-if="valid">Digite a quantidade: {{ quantidade }}</h1>
+	</article>
+	<article ng-if="lotes.length">
+		<h2>Hist&oacute;rico de Movimenta&ccedil;&atilde;o de Estoque do Almoxarifado</h2>
+		<ul>
+			<li ng-repeat="item in lotes">{{ item.material.codigo }} {{ item.material.descricao }}<br><span>quantidade: {{ item.quantidade }}</span></li>
+		</ul>
+	</article>
+	<!-- tags de debug do teclado -->
+	<!--
+	<h3>Teclado:</h3>
+	Tecla pressionada : <span>{{ key_press }}</span>
+	<br />
+	Codigo da tecla : <span>{{ key_code }}</span>
+	<p>Quantidade: {{ quantidade }}</p>
+	<p>Codigo de barras: [{{ barcode }}]</p>
+	<p>Eventos do teclado:</p>
+	<p ng-repeat="key in keys">{{ key.keyCode }} {{ key.charCode }}</p>
+	-->
+</div>

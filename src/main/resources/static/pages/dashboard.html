@@ -1,0 +1,79 @@
+	<div ng-controller="DashboardCtrl as dash">
+		<ul class="breadcrumb breadcrumb-page">
+			<div class="breadcrumb-label text-light-gray">Voce esta aqui: </div>
+			<li><a href="#">Home</a></li>
+			<li class="active"><a href="#">Painel de Controle</a></li>
+		</ul>
+		<div class="page-header">
+			
+			<div class="row">
+				<!-- Page header, center on small screens -->
+				<h1 class="col-xs-12 col-sm-4 text-center text-left-sm"><i class="fa fa-dashboard page-header-icon"></i>&nbsp;&nbsp;Painel de Controle</h1>
+
+				
+			</div>
+		</div> <!-- / .page-header -->
+
+		<div class="row">
+			<div class="col-xs-12">
+				<div class="stat-panel">
+					<div class="stat-row">
+						<!-- Small horizontal padding, bordered, without right border, top aligned text -->
+						<div class="stat-cell col-sm-4 col-md-4 padding-sm-hr bordered no-border-r valign-top">
+							<!-- Small padding, without top padding, extra small horizontal padding -->
+							<h4 class="padding-sm no-padding-t padding-xs-hr"><i class="fa fa-cloud-upload text-primary"></i>&nbsp;&nbsp;Estatistica</h4>
+							<!-- Without margin -->
+							<ul class="list-group no-margin">
+								<!-- Without left and right borders, extra small horizontal padding, without background, no border radius -->
+								<li class="list-group-item no-border-hr no-border-b padding-xs-hr no-bg" ng-repeat="situacao in dash.data.sumario">
+									{{ situacao.descricao }} <span class="label label-danger pull-right">{{ situacao.tempo | timeFormat }}</span> <span class="label {{ situacao.situacao | statusPanelClass }} pull-right"> {{ situacao.percentual }}%</span>
+								</li> <!-- / .list-group-item -->
+								<!-- Without left and right borders, extra small horizontal padding, without background -->
+								<li class="list-group-item no-border-hr padding-xs-hr no-bg">
+									Total <span class="label label-danger pull-right">{{ dash.total| timeFormat }}</span>
+								</li>  <!-- / .list-group-item -->
+								<!-- Without left and right borders, without bottom border, extra small horizontal padding, without background -->
+								<!--<li class="list-group-item no-border-hr no-border-b padding-xs-hr no-bg">
+									Videos <span class="label label-success pull-right">12</span>
+								</li> --> <!-- / .list-group-item -->
+							</ul>
+						</div> <!-- /.stat-cell -->
+						<!-- Primary background, small padding, vertically centered text -->
+						<div class="stat-cell col-xs-12 col-sm-8 col-md-8 bg-primary padding-sm valign-middle">
+							<!-- <div id="hero-graph" class="graph" style="height: 230px;"></div>-->
+							<!-- <barchart class="graph" xkey="xkey" ykeys="ykeys" labels="labels" data="myModel"></barchart>-->
+							<barchart class="graph" xkey="xkey" ykeys="ykeys" labels="labels" data-value="{{myModel}}"></barchart>
+						</div>
+					</div>
+				</div> <!-- /.stat-panel -->
+			</div>
+		</div>
+	
+		<div class="container-fluid">
+		  <div class="row">
+		    <div class="col-md-4 col-xs-12 col-sm-4" ng-repeat="maquina in dash.maquinas">
+		    	<div class="panel {{ maquina.situacao | statusPanelClass }} panel-dark widget-profile">
+					<div class="panel-heading">
+						<a tabindex="-1" href="#/maquina/{{ maquina.codigo }}">
+						<div class="widget-profile-header">
+							<span><b>{{ maquina.nome }}</b></span><br>
+							{{ maquina.situacao | statusName }}
+						</div>
+						</a>
+					</div> <!-- / .panel-heading -->
+					<div class="widget-profile-counters">
+						<div class="col-xs-3"><span>{{ maquina.tempo | dayFormat }}</span><br>tempo</div>
+						<div class="col-xs-3"><span>0</span><br>temp.</div>
+						<div class="col-xs-3"><span>0</span><br>torque</div>
+						<div class="col-xs-3"><span>0</span><br>corrente</div>
+					</div>
+					<div class="widget-profile-text">
+						Operador: {{ maquina.operador }}
+					</div>
+				</div> <!-- / .panel -->
+		    </div>
+		  </div>
+		</div>
+
+
+	</div> <!-- / #content-wrapper -->
