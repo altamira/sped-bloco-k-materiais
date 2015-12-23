@@ -14,22 +14,37 @@ function oblongo(line_offset, head, tail, radius) {
    );
 }
 
-function blank(largura, comprimento, espessura) {
+function blank(params) {
     //var o = Array.prototype.slice.call(arguments);
-    return cube([largura, comprimento, espessura]);
+    return cube([params.largura, params.comprimento, params.espessura]);
 }
 
-function oblongos(raio, tamanho, passo, comprimento) {
+function oblongos(params) {
     
     var o1;
 
     var line_offset = [];
+
+    OpenJsCad.log("Tipo de Cantoneira escolhida: " + params.largura); 
     
-    /* cantoneira n3, setup da furação */
-    line_offset[0] = {line: 15.5, offset: 9.5};   /* primeira fileira de oblongo */
-    line_offset[1] = {line: 70.5, offset: 9.5};   /* segunda fileira de oblongo */
-    line_offset[2] = {line: 50.5, offset: -10.5}; /* terceira fileira de oblongo */
-    
+    if (params.largura < 85) {
+        /* cantoneira n2, setup da furação */
+        line_offset[0] = {line: 10, offset: 9.5};   /* primeira fileira de oblongo */
+        line_offset[1] = {line: 30, offset: -10.5}; /* terceira fileira de oblongo */          
+    } else if (params.largura < 125) {
+        /* cantoneira n3, setup da furação */
+        line_offset[0] = {line: 15.5, offset: 9.5};   /* primeira fileira de oblongo */
+        line_offset[1] = {line: 50.5, offset: -10.5}; /* terceira fileira de oblongo */        
+        line_offset[2] = {line: 70.5, offset: 9.5};   /* segunda fileira de oblongo */
+    } else {
+        /* cantoneira n5, setup da furação */
+        line_offset[0] = {line: 11, offset: 9.5};   /* primeira fileira de oblongo */
+        line_offset[1] = {line: 31, offset: -10.5}; /* terceira fileira de oblongo */        
+        line_offset[2] = {line: 51, offset: 9.5};   /* segunda fileira de oblongo */        
+        line_offset[3] = {line: 95, offset: -10.5}; /* terceira fileira de oblongo */        
+        line_offset[4] = {line: 115, offset: 9.5};   /* segunda fileira de oblongo */        
+    }
+
     var count = 0;
     
     var obl =[];
@@ -38,12 +53,12 @@ function oblongos(raio, tamanho, passo, comprimento) {
     
     for (x = 0; x < line_offset.length; x++) {
         if (line_offset[x].offset < 0) {
-            count = Math.ceil((comprimento - line_offset[x].offset) / passo);
+            count = Math.ceil((params.comprimento - line_offset[x].offset) / params.passo);
         } else {
-            count = Math.ceil(comprimento / passo);
+            count = Math.ceil(params.comprimento / params.passo);
         }
         for (i = 0; i < count; i++) {
-            obl[i] = oblongo(line_offset[x].line, line_offset[x].offset + (i * passo), line_offset[x].offset + (tamanho + (i * passo)), raio);
+            obl[i] = oblongo(line_offset[x].line, line_offset[x].offset + (i * params.passo), line_offset[x].offset + (params.tamanho + (i * params.passo)), params.raio);
         }
         
         if (!u) {
@@ -58,65 +73,58 @@ function oblongos(raio, tamanho, passo, comprimento) {
 
 function getParameterDefinitions() {
   return [
+    /* parametros dos oblongos */
     {
-      name: 'passo', 
-      type: 'int', 
-      initial: 40,
-      caption: "Passo do oblongo:", 
+        name: 'passo', 
+        type: 'int', 
+        initial: 40,
+        caption: "Passo do oblongo (mm):", 
     },
     {
-      name: 'tamanho', 
-      type: 'int', 
-      initial: 21,
-      caption: "Tamanho interno do oblongo:", 
+        name: 'tamanho', 
+        type: 'int', 
+        initial: 21,
+        caption: "Tamanho interno do oblongo (mm):", 
     },
     {
-      name: 'raio', 
-      type: 'float', 
-      initial: 4.5,
-      caption: "Raio do oblongo:", 
+        name: 'raio', 
+        type: 'float', 
+        initial: 4.5,
+        caption: "Raio do oblongo (mm):", 
     },
+    /* parametros da coluna n3 */
     {
-      name: 'comprimento', 
-      type: 'int', 
-      initial: 1000,
-      caption: "Comprimento da cantoneira N3:", 
+        name: 'comprimento', 
+        type: 'int', 
+        initial: 1000,
+        caption: "Comprimento da cantoneira (mm):", 
     },
+    { 
+        name: 'largura', 
+        type: 'choice', 
+        caption: 'Tipo de cantoneira:', 
+        values: [66, 85, 125], 
+        captions: ["N2", "N3", "N5"], 
+        initial: 85 },
     {
-      name: 'largura', 
-      type: 'float', 
-      initial: 85,
-      caption: "Largura da bobina:", 
-    },
-    {
-      name: 'espessura', 
-      type: 'float', 
-      initial: 2,
-      caption: "Espessura da bobina:", 
+        name: 'espessura', 
+        type: 'float', 
+        initial: 2,
+        caption: "Espessura da bobina (mm):", 
     }
   ];
 }
 
 function main(params) {
-    
-    /* parametros dos oblongos */
-    var passo = 40;
-    var tamanho = 21;
-    var raio = 4.5;
-    
-    /* parametros da coluna n3 */
-    var comprimento = 1000;
-    var largura = 85;
-    var espessura = 2;
-    
-    var blk = blank(params.largura, params.comprimento, params.espessura);
-    var obl = oblongos(params.raio, params.tamanho, params.passo, params.comprimento);
+
+    var blk = blank(params);
+    var obl = oblongos(params);
     
     var n3 = difference(blk, obl)
-                .translate([(largura / 2) * -1, (comprimento / 2) * -1, 0])
+                .translate([(params.largura / 2) * -1, (params.comprimento / 2) * -1, 0])
                 .scale(0.2);
 
-    /*
+    /* propriedades fisicas */
     var features = n3.getFeatures(["volume","area"]);
     var volume = features[0];
     var area = features[1];
@@ -134,7 +142,6 @@ function main(params) {
     area = features[1];
     
     OpenJsCad.log("oblongo -> volume: "+Math.ceil(volume)+"; area: "+area);   // volume: 8; area: 24 
-    */
-      
+
     return n3;
 }
