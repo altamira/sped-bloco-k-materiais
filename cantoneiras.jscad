@@ -1,9 +1,9 @@
-// title      : Coluna N3
+// title      : Coluna N2, N3, N5
 // author     : Alessandro
 // license    : MIT License
 // revision   : 0.001
-// tags       : cantoneira, N3
-// file       : n3.jscad
+// tags       : cantoneira, N2, N3, N5
+// file       : cantoneira.jscad
 
 function oblongo(line_offset, head, tail, radius) {
    //var o = Array.prototype.slice.call();
@@ -96,7 +96,7 @@ function getParameterDefinitions() {
     {
         name: 'comprimento', 
         type: 'int', 
-        initial: 1000,
+        initial: 360,
         caption: "Comprimento da cantoneira (mm):", 
     },
     { 
@@ -109,8 +109,8 @@ function getParameterDefinitions() {
     {
         name: 'espessura', 
         type: 'float', 
-        initial: 2,
-        caption: "Espessura da bobina (mm):", 
+        initial: 1.8,
+        caption: "Espessura da chapa (mm):", 
     }
   ];
 }
