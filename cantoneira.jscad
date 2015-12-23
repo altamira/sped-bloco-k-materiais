@@ -58,7 +58,10 @@ function oblongos(params) {
             count = Math.ceil(params.comprimento / params.passo);
         }
         for (i = 0; i < count; i++) {
-            obl[i] = oblongo(line_offset[x].line, line_offset[x].offset + (i * params.passo), line_offset[x].offset + ((params.tamanho - params.diametro) + (i * params.passo)), params.diametro / 2);
+            obl[i] = oblongo(line_offset[x].line, 
+                             line_offset[x].offset + (i * params.passo), 
+                             line_offset[x].offset + ((params.tamanho - params.diametro) + (i * params.passo)), 
+                             params.diametro / 2);
         }
         
         if (!u) {
@@ -94,6 +97,14 @@ function getParameterDefinitions() {
         initial: 1.8,
         caption: "Espessura da chapa (mm):", 
     },
+    { 
+        name: 'cor', 
+        type: 'choice', 
+        caption: 'Cor:', 
+        values: ['blue', 'red', 'orange', 'lime', 'black', 'lightgray', 'darkgray'], 
+        captions: ['Azul', 'Vermelho', 'Laranja', 'Limão', 'Preto', 'Cinza Claro', 'Cinza Escuro'], 
+        initial: 'orange' 
+    },
     /* parametros dos oblongos */
     {
         name: 'tamanho', 
@@ -121,7 +132,8 @@ function main(params) {
     var blk = blank(params);
     var obl = oblongos(params);
     
-    var cantoneira = difference(blk, obl)
+    var cantoneira = //color(params.cor, blk)
+                difference(color(params.cor, blk), obl)
                 .translate([(params.largura / 2) * -1, (params.comprimento / 2) * -1, 0])
                 .scale(0.2);
 
